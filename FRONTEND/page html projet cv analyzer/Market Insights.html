@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="view-transition" content="same-origin">
+    <title>Market Insights - MarketLens</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#2C5282',
+                            900: '#1A365D',
+                        },
+                        warm: {
+                            white: '#F7F5F0',
+                            50: '#FDFBF7',
+                            100: '#F2EFE9',
+                            200: '#E6E2D8',
+                            gray: '#8B8680',
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['DM Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Icons -->
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F7F5F0;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D4D4D4;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8B8680;
+        }
+
+        /* Smooth Transitions */
+        @view-transition {
+            navigation: auto;
+        }
+        
+        /* Grain Overlay for Texture */
+        .bg-grain {
+            position: relative;
+        }
+        .bg-grain::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+        }
+        .content-relative {
+            position: relative;
+            z-index: 1;
+        }
+
+        .paper-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03), 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Chart Animation Classes */
+        .bar-animate {
+            transform: scaleY(0);
+            transform-origin: bottom;
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Container -->
+    <div class="min-h-screen bg-warm-white text-gray-800 font-sans selection:bg-navy-800 selection:text-white">
+        
+        <!-- Navigation (SHARED - DO NOT MODIFY) -->
+        <nav class="fixed w-full z-50 transition-all duration-300 bg-warm-white/90 backdrop-blur-md border-b border-warm-200" id="main-nav">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-20">
+                    <div class="flex items-center gap-2">
+                        <!-- Use Home Link -->
+                        <a href="https://draft-7badafb8-dd3a-47fb-9a7b-e14e1383f4e3.preview.superdesign.dev" class="flex items-center gap-2">
+                            <div class="w-8 h-8 bg-navy-800 rounded-sm flex items-center justify-center text-white">
+                                <iconify-icon icon="lucide:bar-chart-big" width="20"></iconify-icon>
+                            </div>
+                            <span class="font-serif text-xl font-bold text-navy-900 tracking-tight">MarketLens</span>
+                        </a>
+                    </div>
+                    
+                    <div class="hidden md:flex space-x-8">
+                        <!-- Navigation Links -->
+                        <a href="https://draft-05ee301e-5d02-40f4-b33f-ac6d9636a96c.preview.superdesign.dev" id="nav-candidates" class="text-gray-600 hover:text-navy-800 font-medium transition-colors text-sm uppercase tracking-wider">For Candidates</a>
+                        <a href="https://draft-bcba1445-eb62-44f4-a6b8-1181359836a5.preview.superdesign.dev" id="nav-recruiters" class="text-gray-600 hover:text-navy-800 font-medium transition-colors text-sm uppercase tracking-wider">For Recruiters</a>
+                        <a href="#" id="nav-methodology" class="text-gray-600 hover:text-navy-800 font-medium transition-colors text-sm uppercase tracking-wider">Methodology</a>
+                    </div>
+
+                    <div class="flex items-center space-x-4">
+                        <a href="#" id="nav-login" class="text-navy-800 font-medium hover:text-navy-900">Sign In</a>
+                        <a href="https://draft-0dec4529-df83-4366-8eea-75cb8936ead6.preview.superdesign.dev" id="nav-demo" class="bg-navy-800 text-white px-5 py-2.5 rounded-sm hover:bg-navy-900 transition-all shadow-sm hover:shadow-md font-medium text-sm">Get Started</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Content Wrapper -->
+        <main class="pt-20">
+            
+            <!-- Page Header / Filter -->
+            <section class="bg-warm-50 border-b border-warm-200 py-12 lg:py-16">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 mb-8">
+                        <div class="gsap-fade-in">
+                            <div class="flex items-center gap-2 text-sm text-gray-500 mb-4">
+                                <a href="https://draft-7badafb8-dd3a-47fb-9a7b-e14e1383f4e3.preview.superdesign.dev" class="hover:text-navy-800">Home</a>
+                                <iconify-icon icon="lucide:chevron-right" width="12"></iconify-icon>
+                                <span class="text-navy-800 font-medium">Market Insights</span>
+                            </div>
+                            <h1 class="font-serif text-4xl lg:text-5xl text-navy-900 mb-4 leading-tight">Global Market Pulse</h1>
+                            <p class="text-gray-600 max-w-2xl text-lg">
+                                Real-time compensation benchmarks and skill trajectory analysis sourced from verified employment data.
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-4 text-sm text-gray-500 bg-white px-4 py-2 rounded-full border border-warm-200 shadow-sm gsap-fade-in">
+                            <span class="flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                Live Data
+                            </span>
+                            <span class="text-warm-200">|</span>
+                            <span>Last updated: Oct 24, 2024</span>
+                        </div>
+                    </div>
+
+                    <!-- Filter Bar -->
+                    <div class="bg-white p-2 rounded-md shadow-sm border border-warm-200 flex flex-col md:flex-row gap-2 gsap-fade-in">
+                        <div class="relative flex-grow">
+                            <iconify-icon icon="lucide:search" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></iconify-icon>
+                            <input type="text" placeholder="Search role (e.g. Product Manager)" class="w-full pl-11 pr-4 py-3 bg-transparent border-none focus:ring-0 text-navy-900 placeholder-gray-400 outline-none" value="Senior Product Manager">
+                        </div>
+                        <div class="hidden md:block w-px bg-warm-200 my-2"></div>
+                        <div class="relative md:w-48">
+                            <iconify-icon icon="lucide:map-pin" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></iconify-icon>
+                            <select class="w-full pl-11 pr-8 py-3 bg-transparent border-none focus:ring-0 text-navy-900 appearance-none cursor-pointer outline-none">
+                                <option>United States</option>
+                                <option>United Kingdom</option>
+                                <option>Germany</option>
+                                <option>Canada</option>
+                            </select>
+                            <iconify-icon icon="lucide:chevron-down" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></iconify-icon>
+                        </div>
+                        <div class="hidden md:block w-px bg-warm-200 my-2"></div>
+                        <div class="relative md:w-48">
+                            <iconify-icon icon="lucide:briefcase" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></iconify-icon>
+                            <select class="w-full pl-11 pr-8 py-3 bg-transparent border-none focus:ring-0 text-navy-900 appearance-none cursor-pointer outline-none">
+                                <option>Tech & Product</option>
+                                <option>Finance</option>
+                                <option>Healthcare</option>
+                                <option>Marketing</option>
+                            </select>
+                            <iconify-icon icon="lucide:chevron-down" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></iconify-icon>
+                        </div>
+                        <button class="bg-navy-800 text-white px-8 py-3 rounded-sm font-medium hover:bg-navy-900 transition-colors shadow-sm">
+                            Analyze
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Stats -->
+            <section class="border-b border-warm-200 bg-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="grid grid-cols-2 md:grid-cols-4 divide-x divide-warm-200">
+                        <div class="py-8 pr-8 gsap-fade-in">
+                            <div class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Median Base Salary</div>
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-3xl font-serif text-navy-900">$145,000</span>
+                                <span class="text-xs font-medium text-green-600 flex items-center bg-green-50 px-1.5 py-0.5 rounded">
+                                    <iconify-icon icon="lucide:trending-up" class="mr-1"></iconify-icon> 5.2%
+                                </span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">YoY Growth</p>
+                        </div>
+                        <div class="py-8 px-8 gsap-fade-in">
+                            <div class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Open Positions</div>
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-3xl font-serif text-navy-900">12,403</span>
+                                <span class="text-xs font-medium text-red-600 flex items-center bg-red-50 px-1.5 py-0.5 rounded">
+                                    <iconify-icon icon="lucide:trending-down" class="mr-1"></iconify-icon> 1.8%
+                                </span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">Last 30 Days</p>
+                        </div>
+                        <div class="py-8 px-8 gsap-fade-in">
+                            <div class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Avg. Time to Hire</div>
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-3xl font-serif text-navy-900">42 Days</span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">Historical Avg: 38 Days</p>
+                        </div>
+                        <div class="py-8 pl-8 gsap-fade-in">
+                            <div class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Competition Score</div>
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-3xl font-serif text-navy-900">High</span>
+                                <span class="text-xs font-medium text-navy-800 bg-navy-50 px-1.5 py-0.5 rounded">8.5/10</span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">Applicants per role</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main Layout: 2 Cols -->
+            <section class="py-12 lg:py-20 bg-grain">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="grid lg:grid-cols-12 gap-12">
+                        
+                        <!-- Left Content Area -->
+                        <div class="lg:col-span-8 space-y-12">
+                            
+                            <!-- Salary Chart Component -->
+                            <div class="bg-white border border-warm-200 rounded-sm p-8 paper-shadow gsap-fade-in">
+                                <div class="flex justify-between items-start mb-8">
+                                    <div>
+                                        <h2 class="font-serif text-2xl text-navy-900 mb-2">Salary Distribution</h2>
+                                        <p class="text-sm text-gray-500">Base compensation range for Senior Product Manager (US)</p>
+                                    </div>
+                                    <button class="text-sm text-navy-800 font-medium border border-warm-200 px-3 py-1.5 rounded-sm hover:bg-warm-50 transition-colors">Export CSV</button>
+                                </div>
+
+                                <!-- Custom Chart Implementation -->
+                                <div class="relative h-64 mt-12 mb-6">
+                                    <!-- Grid Lines -->
+                                    <div class="absolute inset-0 flex flex-col justify-between text-xs text-gray-400">
+                                        <div class="border-b border-warm-100 w-full pb-1">$220k</div>
+                                        <div class="border-b border-warm-100 w-full pb-1">$180k</div>
+                                        <div class="border-b border-warm-100 w-full pb-1">$140k</div>
+                                        <div class="border-b border-warm-100 w-full pb-1">$100k</div>
+                                        <div class="border-b border-warm-200 w-full"></div>
+                                    </div>
+
+                                    <!-- Bars Container -->
+                                    <div class="absolute inset-0 flex items-end justify-around px-4">
+                                        <!-- Bar 1 -->
+                                        <div class="w-16 relative group">
+                                            <div class="bg-warm-200 h-full w-full rounded-t-sm bar-animate" style="height: 35%;"></div>
+                                            <div class="absolute bottom-0 w-full text-center text-xs font-medium text-gray-500 mt-2 translate-y-full">10th %</div>
+                                            <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-navy-900 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">$115k</div>
+                                        </div>
+                                        <!-- Bar 2 -->
+                                        <div class="w-16 relative group">
+                                            <div class="bg-warm-300 h-full w-full rounded-t-sm bar-animate" style="height: 55%;"></div>
+                                            <div class="absolute bottom-0 w-full text-center text-xs font-medium text-gray-500 mt-2 translate-y-full">25th %</div>
+                                            <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-navy-900 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">$132k</div>
+                                        </div>
+                                        <!-- Bar 3 (Median) -->
+                                        <div class="w-16 relative group">
+                                            <div class="bg-navy-800 h-full w-full rounded-t-sm bar-animate" style="height: 72%;"></div>
+                                            <div class="absolute bottom-0 w-full text-center text-xs font-bold text-navy-800 mt-2 translate-y-full">Median</div>
+                                            <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-navy-900 text-white text-xs py-1 px-2 rounded opacity-100 transition-opacity">$145k</div>
+                                        </div>
+                                        <!-- Bar 4 -->
+                                        <div class="w-16 relative group">
+                                            <div class="bg-warm-300 h-full w-full rounded-t-sm bar-animate" style="height: 85%;"></div>
+                                            <div class="absolute bottom-0 w-full text-center text-xs font-medium text-gray-500 mt-2 translate-y-full">75th %</div>
+                                            <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-navy-900 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">$168k</div>
+                                        </div>
+                                        <!-- Bar 5 -->
+                                        <div class="w-16 relative group">
+                                            <div class="bg-warm-200 h-full w-full rounded-t-sm bar-animate" style="height: 94%;"></div>
+                                            <div class="absolute bottom-0 w-full text-center text-xs font-medium text-gray-500 mt-2 translate-y-full">90th %</div>
+                                            <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-navy-900 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">$195k</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="h-6"></div><!-- Spacer for labels -->
+                            </div>
+
+                            <!-- Skill Trends -->
+                            <div class="grid md:grid-cols-2 gap-8">
+                                <div class="bg-white border border-warm-200 rounded-sm p-6 paper-shadow gsap-fade-in">
+                                    <div class="flex items-center gap-2 mb-6">
+                                        <div class="w-8 h-8 rounded-full bg-green-50 text-green-600 flex items-center justify-center">
+                                            <iconify-icon icon="lucide:trending-up"></iconify-icon>
+                                        </div>
+                                        <h3 class="font-serif text-lg text-navy-900">Rising Demand</h3>
+                                    </div>
+                                    <ul class="space-y-4">
+                                        <li class="flex items-center justify-between">
+                                            <div class="flex items-center gap-3">
+                                                <span class="text-sm font-medium text-gray-700">AI Strategy</span>
+                                                <span class="text-[10px] bg-warm-100 text-gray-600 px-1.5 rounded">Strategic</span>
+                                            </div>
+                                            <span class="text-xs font-bold text-green-600">+42%</span>
+                                        </li>
+                                        <li class="flex items-center justify-between">
+                                            <div class="flex items-center gap-3">
+                                                <span class="text-sm font-medium text-gray-700">Data Visualization</span>
+                                                <span class="text-[10px] bg-warm-100 text-gray-600 px-1.5 rounded">Technical</span>
+                                            </div>
+                                            <span class="text-xs font-bold text-green-600">+28%</span>
+                                        </li>
+                                        <li class="flex items-center justify-between">
+                                            <div class="flex items-center gap-3">
+                                                <span class="text-sm font-medium text-gray-700">Stakeholder Mgmt</span>
+                                                <span class="text-[10px] bg-warm-100 text-gray-600 px-1.5 rounded">Soft Skill</span>
+                                            </div>
+                                            <span class="text-xs font-bold text-green-600">+15%</span>
+                                        </li>
+                                        <li class="flex items-center justify-between">
+                                            <div class="flex items-center gap-3">
+                                                <span class="text-sm font-medium text-gray-700">SQL / Python</span>
+                                                <span class="text-[10px] bg-warm-100 text-gray-600 px-1.5 rounded">Technical</span>
+                                            </div>
+                                            <span class="text-xs font-bold text-green-600">+12%</span>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="bg-white border border-warm-200 rounded-sm p-6 paper-shadow gsap-fade-in">
+                                    <div class="flex items-center gap-2 mb-6">
+                                        <div class="w-8 h-8 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center">
+                                            <iconify-icon icon="lucide:trending-down"></iconify-icon>
+                                        </div>
+                                        <h3 class="font-serif text-lg text-navy-900">Cooling Off</h3>
+                                    </div>
+                                    <ul class="space-y-4">
+                                        <li class="flex items-center justify-between">
+                                            <div class="flex items-center gap-3">
+                                                <span class="text-sm font-medium text-gray-700">Legacy ERP</span>
+                                                <span class="text-[10px] bg-warm-100 text-gray-600 px-1.5 rounded">Technical</span>
+                                            </div>
+                                            <span class="text-xs font-bold text-orange-600">-12%</span>
+                                        </li>
+                                        <li class="flex items-center justify-between">
+                                            <div class="flex items-center gap-3">
+                                                <span class="text-sm font-medium text-gray-700">Project Mgmt (Basic)</span>
+                                                <span class="text-[10px] bg-warm-100 text-gray-600 px-1.5 rounded">Operational</span>
+                                            </div>
+                                            <span class="text-xs font-bold text-orange-600">-8%</span>
+                                        </li>
+                                        <li class="flex items-center justify-between">
+                                            <div class="flex items-center gap-3">
+                                                <span class="text-sm font-medium text-gray-700">Manual QA</span>
+                                                <span class="text-[10px] bg-warm-100 text-gray-600 px-1.5 rounded">Technical</span>
+                                            </div>
+                                            <span class="text-xs font-bold text-orange-600">-18%</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Career Progression -->
+                            <div class="gsap-fade-in">
+                                <h2 class="font-serif text-2xl text-navy-900 mb-6">Typical Career Path</h2>
+                                <div class="relative bg-white border border-warm-200 rounded-sm p-8 paper-shadow overflow-hidden">
+                                    <!-- Connector Line -->
+                                    <div class="absolute top-1/2 left-0 w-full h-0.5 bg-warm-200 -z-0 hidden md:block"></div>
+                                    
+                                    <div class="grid md:grid-cols-3 gap-8 relative z-10">
+                                        <!-- Step 1 -->
+                                        <div class="bg-white p-4 border border-warm-200 rounded-sm hover:border-navy-800 transition-colors group cursor-pointer">
+                                            <div class="text-xs text-gray-400 uppercase mb-2">Entry Level (1-3 yrs)</div>
+                                            <h4 class="font-bold text-navy-900 mb-1">Product Manager</h4>
+                                            <p class="text-sm text-gray-600 mb-4">$95k - $130k</p>
+                                            <div class="flex items-center gap-2 text-xs text-navy-800 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <span>View Requirements</span>
+                                                <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                                            </div>
+                                        </div>
+
+                                        <!-- Step 2 -->
+                                        <div class="bg-navy-50 p-4 border border-navy-800 rounded-sm relative">
+                                            <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-navy-800 text-white text-[10px] px-2 py-0.5 rounded-full">Selected</div>
+                                            <div class="text-xs text-navy-600 uppercase mb-2">Mid Level (4-7 yrs)</div>
+                                            <h4 class="font-bold text-navy-900 mb-1">Senior PM</h4>
+                                            <p class="text-sm text-gray-600 mb-4">$145k - $185k</p>
+                                            <div class="w-full bg-gray-200 rounded-full h-1.5 mb-1">
+                                                <div class="bg-navy-800 h-1.5 rounded-full" style="width: 65%"></div>
+                                            </div>
+                                            <div class="text-[10px] text-gray-500 text-right">Your position</div>
+                                        </div>
+
+                                        <!-- Step 3 -->
+                                        <div class="bg-white p-4 border border-warm-200 rounded-sm hover:border-navy-800 transition-colors group cursor-pointer">
+                                            <div class="text-xs text-gray-400 uppercase mb-2">Senior Level (8+ yrs)</div>
+                                            <h4 class="font-bold text-navy-900 mb-1">Group PM / Director</h4>
+                                            <p class="text-sm text-gray-600 mb-4">$190k - $240k+</p>
+                                            <div class="flex items-center gap-2 text-xs text-navy-800 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <span>See Gap Analysis</span>
+                                                <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Sidebar -->
+                        <div class="lg:col-span-4 space-y-8">
+                            
+                            <!-- Promo Card -->
+                            <div class="bg-navy-900 text-white p-8 rounded-sm paper-shadow relative overflow-hidden gsap-fade-in">
+                                <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                                <h3 class="font-serif text-2xl mb-4 relative z-10">Get the full Q3 Report</h3>
+                                <p class="text-navy-100 text-sm mb-6 relative z-10 leading-relaxed">
+                                    Unlock granular data for 50+ industries, including equity benchmarks and detailed geo-adjustments.
+                                </p>
+                                <a href="https://draft-a30d6f2f-c8b2-4cd1-93a9-17d0ab1b214f.preview.superdesign.dev" class="block w-full text-center bg-white text-navy-900 py-3 rounded-sm font-medium hover:bg-warm-50 transition-colors relative z-10">
+                                    Download PDF
+                                </a>
+                            </div>
+
+                            <!-- Top Hiring Companies -->
+                            <div class="bg-white border border-warm-200 rounded-sm p-6 paper-shadow gsap-fade-in">
+                                <h3 class="font-serif text-lg text-navy-900 mb-4">Top Hiring Now</h3>
+                                <div class="space-y-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-gray-100 rounded-sm flex items-center justify-center font-bold text-gray-500">T</div>
+                                        <div class="flex-1">
+                                            <div class="text-sm font-bold text-navy-900">TechGlobal Inc</div>
+                                            <div class="text-xs text-gray-500">45 Open Roles</div>
+                                        </div>
+                                        <a href="https://draft-0738535b-2202-4438-8478-5aea33145896.preview.superdesign.dev" class="text-navy-800 hover:bg-navy-50 p-2 rounded-sm transition-colors"><iconify-icon icon="lucide:external-link"></iconify-icon></a>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-gray-100 rounded-sm flex items-center justify-center font-bold text-gray-500">F</div>
+                                        <div class="flex-1">
+                                            <div class="text-sm font-bold text-navy-900">FinStream</div>
+                                            <div class="text-xs text-gray-500">28 Open Roles</div>
+                                        </div>
+                                        <a href="https://draft-0738535b-2202-4438-8478-5aea33145896.preview.superdesign.dev" class="text-navy-800 hover:bg-navy-50 p-2 rounded-sm transition-colors"><iconify-icon icon="lucide:external-link"></iconify-icon></a>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-gray-100 rounded-sm flex items-center justify-center font-bold text-gray-500">H</div>
+                                        <div class="flex-1">
+                                            <div class="text-sm font-bold text-navy-900">HealthPlus</div>
+                                            <div class="text-xs text-gray-500">12 Open Roles</div>
+                                        </div>
+                                        <a href="https://draft-0738535b-2202-4438-8478-5aea33145896.preview.superdesign.dev" class="text-navy-800 hover:bg-navy-50 p-2 rounded-sm transition-colors"><iconify-icon icon="lucide:external-link"></iconify-icon></a>
+                                    </div>
+                                </div>
+                                <div class="mt-6 pt-4 border-t border-warm-100 text-center">
+                                    <a href="#" class="text-sm text-navy-800 hover:text-navy-600 font-medium">View all companies</a>
+                                </div>
+                            </div>
+
+                            <!-- Related Roles -->
+                            <div class="bg-white border border-warm-200 rounded-sm p-6 paper-shadow gsap-fade-in">
+                                <h3 class="font-serif text-lg text-navy-900 mb-4">Related Roles</h3>
+                                <div class="flex flex-wrap gap-2">
+                                    <a href="#" class="px-3 py-1 bg-warm-50 border border-warm-200 rounded-full text-xs text-gray-600 hover:border-navy-800 hover:text-navy-800 transition-colors">Technical Product Manager</a>
+                                    <a href="#" class="px-3 py-1 bg-warm-50 border border-warm-200 rounded-full text-xs text-gray-600 hover:border-navy-800 hover:text-navy-800 transition-colors">Product Owner</a>
+                                    <a href="#" class="px-3 py-1 bg-warm-50 border border-warm-200 rounded-full text-xs text-gray-600 hover:border-navy-800 hover:text-navy-800 transition-colors">Program Manager</a>
+                                    <a href="#" class="px-3 py-1 bg-warm-50 border border-warm-200 rounded-full text-xs text-gray-600 hover:border-navy-800 hover:text-navy-800 transition-colors">Business Analyst</a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- CTA Section (SHARED STYLE) -->
+        <section class="py-20 bg-warm-50 border-t border-warm-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-navy-800 rounded-sm p-10 lg:p-16 flex flex-col lg:flex-row items-center justify-between gap-10 text-white relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
+                    <div class="relative z-10">
+                        <h2 class="font-serif text-3xl lg:text-4xl mb-4">Need personalized career advice?</h2>
+                        <p class="text-navy-100 max-w-lg">Upload your CV to see exactly where you stand against these benchmarks.</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-4 relative z-10">
+                        <a href="https://draft-05ee301e-5d02-40f4-b33f-ac6d9636a96c.preview.superdesign.dev" id="cta-footer-start" class="bg-white text-navy-900 px-8 py-3 rounded-sm font-medium hover:bg-warm-50 transition-colors shadow-lg text-center">
+                            Analyze My Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer (SHARED - DO NOT MODIFY) -->
+        <footer class="bg-warm-white pt-16 pb-8 border-t border-warm-200 text-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
+                    <div class="col-span-2 lg:col-span-2">
+                        <div class="flex items-center gap-2 mb-6">
+                            <div class="w-6 h-6 bg-navy-800 rounded-sm flex items-center justify-center text-white">
+                                <iconify-icon icon="lucide:bar-chart-big" width="14"></iconify-icon>
+                            </div>
+                            <span class="font-serif text-lg font-bold text-navy-900">MarketLens</span>
+                        </div>
+                        <p class="text-gray-500 max-w-xs mb-6">
+                            Providing transparency and data-driven insights for the modern labor market. Empowering professionals and hiring teams since 2023.
+                        </p>
+                        <div class="flex gap-4">
+                            <a href="#" id="social-li" class="text-gray-400 hover:text-navy-800 transition-colors"><iconify-icon icon="lucide:linkedin"></iconify-icon></a>
+                            <a href="#" id="social-tw" class="text-gray-400 hover:text-navy-800 transition-colors"><iconify-icon icon="lucide:twitter"></iconify-icon></a>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-bold text-navy-900 mb-4">Platform</h4>
+                        <ul class="space-y-2">
+                            <li><a href="https://draft-05ee301e-5d02-40f4-b33f-ac6d9636a96c.preview.superdesign.dev" id="footer-candidates" class="text-gray-600 hover:text-navy-800 transition-colors">For Candidates</a></li>
+                            <li><a href="https://draft-bcba1445-eb62-44f4-a6b8-1181359836a5.preview.superdesign.dev" id="footer-recruiters" class="text-gray-600 hover:text-navy-800 transition-colors">For Recruiters</a></li>
+                            <li><a href="#" id="footer-pricing" class="text-gray-600 hover:text-navy-800 transition-colors">Pricing</a></li>
+                            <li><a href="#" id="footer-api" class="text-gray-600 hover:text-navy-800 transition-colors">API Access</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-navy-900 mb-4">Company</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#" id="footer-about" class="text-gray-600 hover:text-navy-800 transition-colors">About Us</a></li>
+                            <li><a href="#" id="footer-methodology" class="text-gray-600 hover:text-navy-800 transition-colors">Methodology</a></li>
+                            <li><a href="#" id="footer-careers" class="text-gray-600 hover:text-navy-800 transition-colors">Careers</a></li>
+                            <li><a href="#" id="footer-contact" class="text-gray-600 hover:text-navy-800 transition-colors">Contact</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-navy-900 mb-4">Legal</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#" id="footer-privacy" class="text-gray-600 hover:text-navy-800 transition-colors">Privacy Policy</a></li>
+                            <li><a href="#" id="footer-terms" class="text-gray-600 hover:text-navy-800 transition-colors">Terms of Service</a></li>
+                            <li><a href="#" id="footer-security" class="text-gray-600 hover:text-navy-800 transition-colors">Security</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="pt-8 border-t border-warm-200 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-400">
+                    <p>&copy; 2024 MarketLens Intelligence Inc. All rights reserved.</p>
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                        <span>Systems Operational</span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Interactions -->
+    <script>
+        // Navigation Scroll Effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('main-nav');
+            if (window.scrollY > 10) {
+                nav.classList.add('shadow-sm');
+            } else {
+                nav.classList.remove('shadow-sm');
+            }
+        });
+
+        // GSAP Animations
+        document.addEventListener('DOMContentLoaded', () => {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Fade Ins
+            const fadeElements = document.querySelectorAll('.gsap-fade-in');
+            fadeElements.forEach(el => {
+                gsap.from(el, {
+                    scrollTrigger: {
+                        trigger: el,
+                        start: "top 90%",
+                        toggleActions: "play none none reverse"
+                    },
+                    y: 30,
+                    opacity: 0,
+                    duration: 0.8,
+                    ease: "power3.out"
+                });
+            });
+
+            // Bar Chart Animation
+            gsap.to(".bar-animate", {
+                scrollTrigger: {
+                    trigger: ".bar-animate",
+                    start: "top 85%",
+                },
+                scaleY: 1,
+                duration: 1.2,
+                ease: "power3.out",
+                stagger: 0.1
+            });
+        });
+    </script>
+</body>
+</html>

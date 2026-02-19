@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="view-transition" content="same-origin">
+    <title>Job Definition - MarketLens</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            50: '#F0F4F8',
+                            100: '#D9E2EC',
+                            800: '#2C5282',
+                            900: '#1A365D',
+                        },
+                        warm: {
+                            white: '#F7F5F0',
+                            50: '#FDFBF7',
+                            100: '#F2EFE9',
+                            200: '#E6E2D8',
+                            gray: '#8B8680',
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['DM Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Icons -->
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F7F5F0;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D4D4D4;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8B8680;
+        }
+
+        /* Smooth Transitions */
+        @view-transition {
+            navigation: auto;
+        }
+        
+        /* Grain Overlay for Texture */
+        .bg-grain {
+            position: relative;
+        }
+        .bg-grain::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+        }
+        .content-relative {
+            position: relative;
+            z-index: 1;
+        }
+
+        .paper-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03), 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Custom Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #2C5282;
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 1);
+            border: 1px solid #1A365D;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #E6E2D8;
+            border-radius: 2px;
+        }
+        input[type=range]:focus::-webkit-slider-thumb {
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 1), 0 0 0 6px rgba(44, 82, 130, 0.2);
+        }
+
+        /* Custom Checkbox */
+        .custom-checkbox:checked {
+            background-color: #2C5282;
+            border-color: #2C5282;
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Container -->
+    <div class="min-h-screen bg-warm-white text-gray-800 font-sans selection:bg-navy-800 selection:text-white">
+        
+        <!-- Navigation -->
+        <nav class="fixed w-full z-50 transition-all duration-300 bg-warm-white/90 backdrop-blur-md border-b border-warm-200" id="main-nav">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-20">
+                    <div class="flex items-center gap-2">
+                        <a href="https://draft-7badafb8-dd3a-47fb-9a7b-e14e1383f4e3.preview.superdesign.dev" class="w-8 h-8 bg-navy-800 rounded-sm flex items-center justify-center text-white">
+                            <iconify-icon icon="lucide:bar-chart-big" width="20"></iconify-icon>
+                        </a>
+                        <span class="font-serif text-xl font-bold text-navy-900 tracking-tight">MarketLens</span>
+                    </div>
+                    
+                    <div class="hidden md:flex space-x-8">
+                        <a href="https://draft-05ee301e-5d02-40f4-b33f-ac6d9636a96c.preview.superdesign.dev" id="nav-candidates" class="text-gray-600 hover:text-navy-800 font-medium transition-colors text-sm uppercase tracking-wider">For Candidates</a>
+                        <a href="https://draft-bcba1445-eb62-44f4-a6b8-1181359836a5.preview.superdesign.dev" id="nav-recruiters" class="text-navy-800 font-bold border-b-2 border-navy-800 pb-6 -mb-6 transition-colors text-sm uppercase tracking-wider">For Recruiters</a>
+                        <a href="#" id="nav-methodology" class="text-gray-600 hover:text-navy-800 font-medium transition-colors text-sm uppercase tracking-wider">Methodology</a>
+                    </div>
+
+                    <div class="flex items-center space-x-4">
+                        <a href="#" id="nav-login" class="text-navy-800 font-medium hover:text-navy-900">Sign In</a>
+                        <a href="#" id="nav-demo" class="bg-navy-800 text-white px-5 py-2.5 rounded-sm hover:bg-navy-900 transition-all shadow-sm hover:shadow-md font-medium text-sm">Get Started</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Page Header & Breadcrumb -->
+        <div class="pt-32 pb-10 bg-grain border-b border-warm-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 content-relative">
+                    <div>
+                        <div class="flex items-center gap-2 text-sm text-gray-500 mb-3">
+                            <a href="https://draft-bcba1445-eb62-44f4-a6b8-1181359836a5.preview.superdesign.dev" class="hover:text-navy-800">Dashboard</a>
+                            <iconify-icon icon="lucide:chevron-right" class="text-xs"></iconify-icon>
+                            <span class="text-navy-800 font-medium">New Position</span>
+                        </div>
+                        <h1 class="font-serif text-3xl lg:text-4xl font-semibold text-navy-900">Job Definition Setup</h1>
+                        <p class="text-gray-600 mt-2 max-w-2xl">Define core competencies and requirements to enable accurate candidate matching and market benchmarking.</p>
+                    </div>
+                    
+                    <div class="flex items-center gap-3">
+                        <button class="px-4 py-2 text-navy-800 font-medium hover:bg-white/50 rounded-sm transition-colors">
+                            Save Draft
+                        </button>
+                        <button class="flex items-center gap-2 bg-navy-800 text-white px-6 py-2.5 rounded-sm hover:bg-navy-900 transition-all shadow-sm">
+                            <span>Next: Benchmarking</span>
+                            <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Layout -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                
+                <!-- Left Column: Setup Form (8 Cols) -->
+                <div class="lg:col-span-8 space-y-8">
+                    
+                    <!-- Section 1: Position Details -->
+                    <div class="bg-white rounded-md paper-shadow border border-warm-200 p-8 gsap-fade-in">
+                        <div class="flex justify-between items-start mb-6">
+                            <h3 class="font-serif text-xl font-bold text-navy-900">Position Details</h3>
+                            <button class="text-sm text-navy-800 hover:underline flex items-center gap-1">
+                                <iconify-icon icon="lucide:upload"></iconify-icon> Import from JD File
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div class="col-span-2">
+                                <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Job Title</label>
+                                <input type="text" value="Senior Product Manager" class="w-full px-4 py-3 bg-warm-50 border border-warm-200 rounded-sm focus:outline-none focus:border-navy-800 focus:ring-1 focus:ring-navy-800 transition-all text-navy-900 font-medium" placeholder="e.g. Senior Product Designer">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Department</label>
+                                <select class="w-full px-4 py-3 bg-warm-50 border border-warm-200 rounded-sm focus:outline-none focus:border-navy-800 text-navy-900">
+                                    <option>Product & Design</option>
+                                    <option>Engineering</option>
+                                    <option>Marketing</option>
+                                    <option>Sales</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Location Type</label>
+                                <select class="w-full px-4 py-3 bg-warm-50 border border-warm-200 rounded-sm focus:outline-none focus:border-navy-800 text-navy-900">
+                                    <option>Hybrid (London, UK)</option>
+                                    <option>Remote (Global)</option>
+                                    <option>On-site</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Role Description Summary</label>
+                            <textarea class="w-full px-4 py-3 bg-warm-50 border border-warm-200 rounded-sm focus:outline-none focus:border-navy-800 min-h-[120px] text-gray-600 resize-none" placeholder="Describe the primary purpose of this role...">Leading the core platform team to define product strategy, roadmap, and execution. Working closely with engineering and design to deliver high-impact features for our enterprise customers.</textarea>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Competency Framework -->
+                    <div class="bg-white rounded-md paper-shadow border border-warm-200 p-8 gsap-fade-in">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-serif text-xl font-bold text-navy-900">Competency Framework</h3>
+                            <span class="px-3 py-1 bg-green-50 text-green-700 text-xs font-bold uppercase rounded-full tracking-wide">AI Suggested</span>
+                        </div>
+                        <p class="text-sm text-gray-500 mb-8">Define the skills and proficiency levels required for this role. These weightings directly influence the candidate matching algorithm.</p>
+
+                        <!-- Add New Skill Bar -->
+                        <div class="flex gap-3 mb-8">
+                            <div class="relative flex-1">
+                                <iconify-icon icon="lucide:search" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></iconify-icon>
+                                <input type="text" class="w-full pl-10 pr-4 py-3 bg-white border border-warm-200 rounded-sm focus:outline-none focus:border-navy-800 shadow-sm" placeholder="Search for a skill (e.g. 'Agile', 'Python')">
+                            </div>
+                            <button class="px-6 py-3 bg-warm-100 text-navy-900 font-medium rounded-sm hover:bg-warm-200 transition-colors border border-warm-200">
+                                Add
+                            </button>
+                        </div>
+
+                        <!-- Skills List -->
+                        <div class="space-y-6">
+                            
+                            <!-- Skill Item 1 -->
+                            <div class="p-5 border border-warm-200 rounded-sm bg-warm-50/50 hover:bg-white transition-colors">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="cursor-grab text-gray-400 hover:text-navy-800"><iconify-icon icon="lucide:grip-vertical"></iconify-icon></div>
+                                        <div>
+                                            <h4 class="font-bold text-navy-900">Product Strategy</h4>
+                                            <p class="text-xs text-gray-500">Strategic Planning • Roadmap Definition</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button class="text-gray-400 hover:text-red-500 transition-colors"><iconify-icon icon="lucide:trash-2" width="16"></iconify-icon></button>
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                                    <div>
+                                        <div class="flex justify-between text-xs font-bold uppercase text-gray-500 mb-2">
+                                            <span>Required Proficiency</span>
+                                            <span class="text-navy-800">Expert (4/5)</span>
+                                        </div>
+                                        <input type="range" min="1" max="5" value="4" class="w-full h-1 bg-warm-200 rounded-lg appearance-none cursor-pointer">
+                                        <div class="flex justify-between text-[10px] text-gray-400 mt-1">
+                                            <span>Novice</span>
+                                            <span>Expert</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-4">
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" checked class="custom-checkbox w-4 h-4 rounded border-gray-300 text-navy-800 focus:ring-navy-800">
+                                            <span class="text-sm text-navy-900 font-medium">Must-have</span>
+                                        </label>
+                                        <div class="h-4 w-px bg-warm-200"></div>
+                                        <select class="text-sm bg-transparent border-none text-gray-600 focus:ring-0 cursor-pointer hover:text-navy-800">
+                                            <option>High Importance</option>
+                                            <option>Medium Importance</option>
+                                            <option>Low Importance</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Skill Item 2 -->
+                            <div class="p-5 border border-warm-200 rounded-sm bg-warm-50/50 hover:bg-white transition-colors">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="cursor-grab text-gray-400 hover:text-navy-800"><iconify-icon icon="lucide:grip-vertical"></iconify-icon></div>
+                                        <div>
+                                            <h4 class="font-bold text-navy-900">Data Analysis</h4>
+                                            <p class="text-xs text-gray-500">SQL • Tableau • A/B Testing</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button class="text-gray-400 hover:text-red-500 transition-colors"><iconify-icon icon="lucide:trash-2" width="16"></iconify-icon></button>
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                                    <div>
+                                        <div class="flex justify-between text-xs font-bold uppercase text-gray-500 mb-2">
+                                            <span>Required Proficiency</span>
+                                            <span class="text-navy-800">Advanced (3/5)</span>
+                                        </div>
+                                        <input type="range" min="1" max="5" value="3" class="w-full h-1 bg-warm-200 rounded-lg appearance-none cursor-pointer">
+                                        <div class="flex justify-between text-[10px] text-gray-400 mt-1">
+                                            <span>Novice</span>
+                                            <span>Expert</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-4">
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" class="custom-checkbox w-4 h-4 rounded border-gray-300 text-navy-800 focus:ring-navy-800">
+                                            <span class="text-sm text-gray-600">Must-have</span>
+                                        </label>
+                                        <div class="h-4 w-px bg-warm-200"></div>
+                                        <select class="text-sm bg-transparent border-none text-gray-600 focus:ring-0 cursor-pointer hover:text-navy-800">
+                                            <option>Medium Importance</option>
+                                            <option>High Importance</option>
+                                            <option>Low Importance</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Skill Item 3 -->
+                            <div class="p-5 border border-warm-200 rounded-sm bg-warm-50/50 hover:bg-white transition-colors">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="cursor-grab text-gray-400 hover:text-navy-800"><iconify-icon icon="lucide:grip-vertical"></iconify-icon></div>
+                                        <div>
+                                            <h4 class="font-bold text-navy-900">Stakeholder Management</h4>
+                                            <p class="text-xs text-gray-500">Communication • Negotiation</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button class="text-gray-400 hover:text-red-500 transition-colors"><iconify-icon icon="lucide:trash-2" width="16"></iconify-icon></button>
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                                    <div>
+                                        <div class="flex justify-between text-xs font-bold uppercase text-gray-500 mb-2">
+                                            <span>Required Proficiency</span>
+                                            <span class="text-navy-800">Expert (5/5)</span>
+                                        </div>
+                                        <input type="range" min="1" max="5" value="5" class="w-full h-1 bg-warm-200 rounded-lg appearance-none cursor-pointer">
+                                        <div class="flex justify-between text-[10px] text-gray-400 mt-1">
+                                            <span>Novice</span>
+                                            <span>Expert</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-4">
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" checked class="custom-checkbox w-4 h-4 rounded border-gray-300 text-navy-800 focus:ring-navy-800">
+                                            <span class="text-sm text-navy-900 font-medium">Must-have</span>
+                                        </label>
+                                        <div class="h-4 w-px bg-warm-200"></div>
+                                        <select class="text-sm bg-transparent border-none text-gray-600 focus:ring-0 cursor-pointer hover:text-navy-800">
+                                            <option>High Importance</option>
+                                            <option>Medium Importance</option>
+                                            <option>Low Importance</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Suggestion Strip -->
+                        <div class="mt-6 pt-6 border-t border-dashed border-warm-200">
+                            <p class="text-xs font-bold text-navy-800 uppercase tracking-wide mb-3">Suggested for "Product Manager"</p>
+                            <div class="flex flex-wrap gap-2">
+                                <button class="px-3 py-1 bg-white border border-warm-200 rounded-full text-xs text-gray-600 hover:border-navy-800 hover:text-navy-800 transition-colors flex items-center gap-1">
+                                    <iconify-icon icon="lucide:plus" width="12"></iconify-icon> Agile Methodologies
+                                </button>
+                                <button class="px-3 py-1 bg-white border border-warm-200 rounded-full text-xs text-gray-600 hover:border-navy-800 hover:text-navy-800 transition-colors flex items-center gap-1">
+                                    <iconify-icon icon="lucide:plus" width="12"></iconify-icon> User Research
+                                </button>
+                                <button class="px-3 py-1 bg-white border border-warm-200 rounded-full text-xs text-gray-600 hover:border-navy-800 hover:text-navy-800 transition-colors flex items-center gap-1">
+                                    <iconify-icon icon="lucide:plus" width="12"></iconify-icon> JIRA
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Sidebar (4 Cols) -->
+                <div class="lg:col-span-4 space-y-6">
+                    
+                    <!-- Market Lens Widget -->
+                    <div class="bg-navy-900 text-white rounded-md p-6 shadow-xl sticky top-24 gsap-fade-in">
+                        <div class="flex items-center gap-2 mb-6 border-b border-white/10 pb-4">
+                            <iconify-icon icon="lucide:activity" class="text-green-400"></iconify-icon>
+                            <h3 class="font-serif text-lg font-medium">Live Market Analysis</h3>
+                        </div>
+
+                        <div class="space-y-6">
+                            <!-- Metric 1 -->
+                            <div>
+                                <div class="flex justify-between text-sm mb-2 text-navy-100">
+                                    <span>Role Clarity Score</span>
+                                    <span class="font-bold text-white">85/100</span>
+                                </div>
+                                <div class="w-full bg-white/10 rounded-full h-1.5">
+                                    <div class="bg-green-400 h-1.5 rounded-full" style="width: 85%"></div>
+                                </div>
+                                <p class="text-xs text-navy-200 mt-2 leading-relaxed">
+                                    Your job definition is specific and aligns well with market standards.
+                                </p>
+                            </div>
+
+                            <!-- Metric 2 -->
+                            <div class="p-4 bg-white/5 rounded-sm border border-white/10">
+                                <div class="text-xs text-navy-200 uppercase tracking-wide mb-1">Estimated Candidate Pool</div>
+                                <div class="text-2xl font-serif font-bold text-white mb-1">1,240</div>
+                                <div class="flex items-center gap-1 text-xs text-green-400">
+                                    <iconify-icon icon="lucide:trending-up"></iconify-icon>
+                                    <span>+12% vs last month</span>
+                                </div>
+                            </div>
+
+                            <!-- Metric 3 -->
+                            <div class="p-4 bg-white/5 rounded-sm border border-white/10">
+                                <div class="text-xs text-navy-200 uppercase tracking-wide mb-1">Avg. Salary Benchmark</div>
+                                <div class="text-2xl font-serif font-bold text-white mb-1">$135k - $160k</div>
+                                <p class="text-xs text-navy-200">
+                                    For Senior PM roles in London
+                                </p>
+                            </div>
+
+                            <a href="https://draft-e013a0fe-3eae-48d4-aadd-fc76364989ca.preview.superdesign.dev" class="block w-full text-center py-2 text-sm text-white/70 hover:text-white border border-white/20 rounded-sm hover:bg-white/5 transition-colors">
+                                View Full Market Report
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Tips Widget -->
+                    <div class="bg-warm-100/50 rounded-md p-6 border border-warm-200 gsap-fade-in">
+                        <h4 class="font-bold text-navy-900 mb-4 flex items-center gap-2">
+                            <iconify-icon icon="lucide:lightbulb" class="text-yellow-600"></iconify-icon>
+                            Optimization Tips
+                        </h4>
+                        <ul class="space-y-4 text-sm text-gray-600">
+                            <li class="flex gap-3">
+                                <div class="w-1.5 h-1.5 rounded-full bg-navy-800 mt-1.5 shrink-0"></div>
+                                <p>Adding <strong>"Agile Coaching"</strong> as a nice-to-have skill expands your candidate pool by ~15%.</p>
+                            </li>
+                            <li class="flex gap-3">
+                                <div class="w-1.5 h-1.5 rounded-full bg-navy-800 mt-1.5 shrink-0"></div>
+                                <p>Profiles with 5-7 core competencies receive 40% more relevant matches than those with 10+.</p>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Action Bar (Mobile Sticky) -->
+        <div class="fixed bottom-0 left-0 w-full bg-white border-t border-warm-200 p-4 lg:hidden z-40">
+             <button class="w-full bg-navy-800 text-white px-6 py-3 rounded-sm font-medium shadow-lg">
+                Next: Benchmarking
+            </button>
+        </div>
+
+        <!-- Footer -->
+        <footer class="bg-warm-white pt-16 pb-8 border-t border-warm-200 text-sm mt-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
+                    <div class="col-span-2 lg:col-span-2">
+                        <div class="flex items-center gap-2 mb-6">
+                            <div class="w-6 h-6 bg-navy-800 rounded-sm flex items-center justify-center text-white">
+                                <iconify-icon icon="lucide:bar-chart-big" width="14"></iconify-icon>
+                            </div>
+                            <span class="font-serif text-lg font-bold text-navy-900">MarketLens</span>
+                        </div>
+                        <p class="text-gray-500 max-w-xs mb-6">
+                            Providing transparency and data-driven insights for the modern labor market. Empowering professionals and hiring teams since 2023.
+                        </p>
+                        <div class="flex gap-4">
+                            <a href="#" id="social-li" class="text-gray-400 hover:text-navy-800 transition-colors"><iconify-icon icon="lucide:linkedin"></iconify-icon></a>
+                            <a href="#" id="social-tw" class="text-gray-400 hover:text-navy-800 transition-colors"><iconify-icon icon="lucide:twitter"></iconify-icon></a>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-bold text-navy-900 mb-4">Platform</h4>
+                        <ul class="space-y-2">
+                            <li><a href="https://draft-05ee301e-5d02-40f4-b33f-ac6d9636a96c.preview.superdesign.dev" id="footer-candidates" class="text-gray-600 hover:text-navy-800 transition-colors">For Candidates</a></li>
+                            <li><a href="https://draft-bcba1445-eb62-44f4-a6b8-1181359836a5.preview.superdesign.dev" id="footer-recruiters" class="text-gray-600 hover:text-navy-800 transition-colors">For Recruiters</a></li>
+                            <li><a href="#" id="footer-pricing" class="text-gray-600 hover:text-navy-800 transition-colors">Pricing</a></li>
+                            <li><a href="#" id="footer-api" class="text-gray-600 hover:text-navy-800 transition-colors">API Access</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-navy-900 mb-4">Company</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#" id="footer-about" class="text-gray-600 hover:text-navy-800 transition-colors">About Us</a></li>
+                            <li><a href="#" id="footer-methodology" class="text-gray-600 hover:text-navy-800 transition-colors">Methodology</a></li>
+                            <li><a href="#" id="footer-careers" class="text-gray-600 hover:text-navy-800 transition-colors">Careers</a></li>
+                            <li><a href="#" id="footer-contact" class="text-gray-600 hover:text-navy-800 transition-colors">Contact</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-navy-900 mb-4">Legal</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#" id="footer-privacy" class="text-gray-600 hover:text-navy-800 transition-colors">Privacy Policy</a></li>
+                            <li><a href="#" id="footer-terms" class="text-gray-600 hover:text-navy-800 transition-colors">Terms of Service</a></li>
+                            <li><a href="#" id="footer-security" class="text-gray-600 hover:text-navy-800 transition-colors">Security</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="pt-8 border-t border-warm-200 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-400">
+                    <p>&copy; 2024 MarketLens Intelligence Inc. All rights reserved.</p>
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                        <span>Systems Operational</span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Interactions -->
+    <script>
+        // Navigation Scroll Effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('main-nav');
+            if (window.scrollY > 10) {
+                nav.classList.add('shadow-sm');
+            } else {
+                nav.classList.remove('shadow-sm');
+            }
+        });
+
+        // GSAP Animations
+        document.addEventListener('DOMContentLoaded', () => {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Fade In Elements
+            const fadeElements = document.querySelectorAll('.gsap-fade-in');
+            fadeElements.forEach((el, index) => {
+                gsap.from(el, {
+                    y: 20,
+                    opacity: 0,
+                    duration: 0.6,
+                    delay: index * 0.1,
+                    ease: "power3.out"
+                });
+            });
+
+            // Range Slider Interaction Visuals
+            document.querySelectorAll('input[type=range]').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    // Could add visual feedback logic here if needed
+                });
+            });
+        });
+    </script>
+</body>
+</html>

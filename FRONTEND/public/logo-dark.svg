@@ -1,0 +1,31 @@
+<!-- Hirevion Logo - Dark Mode Version -->
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="darkGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#63B3ED;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#4299E1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3182CE;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Pencil Icon -->
+  <g transform="translate(10, 10)">
+    <rect x="0" y="5" width="30" height="10" fill="#63B3ED" rx="2"/>
+    <polygon points="30,5 38,10 30,15" fill="#F6AD55"/>
+    <polygon points="38,10 42,10 38,8 38,12" fill="#FFFFFF"/>
+    <rect x="5" y="8" width="20" height="4" fill="#90CDF4" opacity="0.6" rx="1"/>
+  </g>
+  
+  <!-- Brand Name -->
+  <text x="55" y="38" font-family="'Playfair Display', serif" font-size="32" font-weight="700" fill="url(#darkGradient)" letter-spacing="-0.5">
+    Hirevion
+  </text>
+  
+  <!-- Tagline -->
+  <text x="55" y="52" font-family="'DM Sans', sans-serif" font-size="10" font-weight="500" fill="#A0AEC0" letter-spacing="1.5">
+    AI-POWERED HIRING
+  </text>
+  
+  <!-- Pencil Stroke -->
+  <path d="M 55 42 Q 100 45, 180 42" stroke="#F6AD55" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.8"/>
+</svg>

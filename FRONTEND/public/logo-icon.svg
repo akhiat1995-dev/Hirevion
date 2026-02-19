@@ -1,0 +1,28 @@
+<!-- Hirevion Icon Only - For Favicon, App Icon, Small Spaces -->
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1A365D;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2C5282;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background rounded square -->
+  <rect x="4" y="4" width="56" height="56" rx="12" fill="url(#iconGradient)"/>
+  
+  <!-- Pencil body -->
+  <rect x="14" y="26" width="32" height="12" fill="white" rx="2"/>
+  
+  <!-- Pencil wood part -->
+  <polygon points="46,26 54,32 46,38" fill="#F6AD55"/>
+  
+  <!-- Pencil tip (lead) -->
+  <polygon points="54,32 58,32 54,29 54,35" fill="#1A202C"/>
+  
+  <!-- Highlight line on pencil -->
+  <rect x="18" y="30" width="24" height="4" fill="#63B3ED" opacity="0.5" rx="1"/>
+  
+  <!-- AI Accent Dot (top right) -->
+  <circle cx="50" cy="14" r="6" fill="#F6AD55"/>
+  <circle cx="50" cy="14" r="3" fill="white"/>
+</svg>

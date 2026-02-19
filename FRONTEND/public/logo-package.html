@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hirevion Logo Package</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: #F7F5F0;
+            color: #1A365D;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1A365D 0%, #2C5282 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section h2 {
+            font-family: 'Playfair Display', serif;
+            color: #1A365D;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        
+        .logo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        .logo-card {
+            background: #FDFBF7;
+            border: 2px solid #E6E2D8;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        
+        .logo-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo-card h3 {
+            color: #1A365D;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .logo-card .preview {
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 4px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo-card.dark-bg .preview {
+            background: #1A202C;
+        }
+        
+        .logo-card code {
+            display: block;
+            background: #F2EFE9;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #2C5282;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .size-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .size-item {
+            text-align: center;
+        }
+        
+        .size-item span {
+            display: block;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #718096;
+        }
+        
+        .usage-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .usage-table th,
+        .usage-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #E6E2D8;
+        }
+        
+        .usage-table th {
+            background: #F2EFE9;
+            font-weight: 600;
+            color: #1A365D;
+        }
+        
+        .download-btn {
+            display: inline-block;
+            background: #2C5282;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: 20px;
+            transition: background 0.2s;
+        }
+        
+        .download-btn:hover {
+            background: #1A365D;
+        }
+        
+        .color-palette {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .color-item {
+            width: 100px;
+            text-align: center;
+        }
+        
+        .color-swatch {
+            width: 100%;
+            height: 80px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .color-item span {
+            font-size: 12px;
+            color: #718096;
+        }
+        
+        footer {
+            background: #1A365D;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-top: 40px;
+        }
+        
+        footer p {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Hirevion</h1>
+        <p>Complete Logo Package & Brand Assets</p>
+    </div>
+    
+    <div class="container">
+        <!-- Logo Variations -->
+        <div class="section">
+            <h2>📦 Logo Variations</h2>
+            <p>Choose the right logo for each use case:</p>
+            
+            <div class="logo-grid">
+                <div class="logo-card">
+                    <h3>Default Logo</h3>
+                    <div class="preview">
+                        <img src="logo.svg" alt="Hirevion Logo" width="200">
+                    </div>
+                    <p>Full logo with text and tagline</p>
+                    <code>logo.svg</code>
+                </div>
+                
+                <div class="logo-card">
+                    <h3>Icon Only</h3>
+                    <div class="preview">
+                        <img src="logo-icon.svg" alt="Hirevion Icon" width="64">
+                    </div>
+                    <p>For favicon, app icons, small spaces</p>
+                    <code>logo-icon.svg</code>
+                </div>
+                
+                <div class="logo-card dark-bg">
+                    <h3>Dark Mode</h3>
+                    <div class="preview">
+                        <img src="logo-dark.svg" alt="Hirevion Dark" width="200">
+                    </div>
+                    <p>For dark backgrounds</p>
+                    <code>logo-dark.svg</code>
+                </div>
+                
+                <div class="logo-card">
+                    <h3>Monochrome</h3>
+                    <div class="preview" style="color: #1A365D;">
+                        <svg width="200" height="60" viewBox="0 0 200 60">
+                            <g transform="translate(10, 10)">
+                                <rect x="0" y="5" width="30" height="10" fill="currentColor" rx="2"/>
+                                <polygon points="30,5 38,10 30,15" fill="currentColor"/>
+                                <polygon points="38,10 42,10 38,8 38,12" fill="currentColor"/>
+                            </g>
+                            <text x="55" y="38" font-family="'Playfair Display', serif" font-size="32" font-weight="700" fill="currentColor">Hirevion</text>
+                        </svg>
+                    </div>
+                    <p>Single color for print/fax</p>
+                    <code>logo-mono.svg</code>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Size Variations -->
+        <div class="section">
+            <h2>📏 Size Variations</h2>
+            <p>Use these standard sizes:</p>
+            
+            <div class="size-grid">
+                <div class="size-item">
+                    <svg width="32" height="32" viewBox="0 0 64 64">
+                        <rect x="4" y="4" width="56" height="56" rx="12" fill="#2C5282"/>
+                        <rect x="14" y="26" width="32" height="12" fill="white" rx="2"/>
+                        <polygon points="46,26 54,32 46,38" fill="#F6AD55"/>
+                        <circle cx="50" cy="14" r="6" fill="#F6AD55"/>
+                    </svg>
+                    <span>32px<br>Favicon</span>
+                </div>
+                
+                <div class="size-item">
+                    <svg width="64" height="64" viewBox="0 0 64 64">
+                        <rect x="4" y="4" width="56" height="56" rx="12" fill="#2C5282"/>
+                        <rect x="14" y="26" width="32" height="12" fill="white" rx="2"/>
+                        <polygon points="46,26 54,32 46,38" fill="#F6AD55"/>
+                        <circle cx="50" cy="14" r="6" fill="#F6AD55"/>
+                    </svg>
+                    <span>64px<br>App Icon</span>
+                </div>
+                
+                <div class="size-item">
+                    <svg width="120" height="36" viewBox="0 0 200 60">
+                        <g transform="translate(10, 10)">
+                            <rect x="0" y="5" width="30" height="10" fill="#2C5282" rx="2"/>
+                            <polygon points="30,5 38,10 30,15" fill="#F6AD55"/>
+                        </g>
+                        <text x="55" y="38" font-family="'Playfair Display', serif" font-size="32" font-weight="700" fill="#1A365D">Hirevion</text>
+                    </svg>
+                    <span>120px<br>Mobile Header</span>
+                </div>
+                
+                <div class="size-item">
+                    <svg width="200" height="60" viewBox="0 0 200 60">
+                        <g transform="translate(10, 10)">
+                            <rect x="0" y="5" width="30" height="10" fill="#2C5282" rx="2"/>
+                            <polygon points="30,5 38,10 30,15" fill="#F6AD55"/>
+                        </g>
+                        <text x="55" y="38" font-family="'Playfair Display', serif" font-size="32" font-weight="700" fill="#1A365D">Hirevion</text>
+                        <text x="55" y="52" font-family="'DM Sans', sans-serif" font-size="10" fill="#718096">AI-POWERED HIRING</text>
+                    </svg>
+                    <span>200px<br>Desktop Header</span>
+                </div>
+                
+                <div class="size-item">
+                    <svg width="300" height="90" viewBox="0 0 200 60">
+                        <g transform="translate(10, 10)">
+                            <rect x="0" y="5" width="30" height="10" fill="#2C5282" rx="2"/>
+                            <polygon points="30,5 38,10 30,15" fill="#F6AD55"/>
+                        </g>
+                        <text x="55" y="38" font-family="'Playfair Display', serif" font-size="32" font-weight="700" fill="#1A365D">Hirevion</text>
+                        <text x="55" y="52" font-family="'DM Sans', sans-serif" font-size="10" fill="#718096">AI-POWERED HIRING</text>
+                    </svg>
+                    <span>300px+<br>Hero Sections</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Color Palette -->
+        <div class="section">
+            <h2>🎨 Brand Colors</h2>
+            <p>Official color palette for all brand materials:</p>
+            
+            <div class="color-palette">
+                <div class="color-item">
+                    <div class="color-swatch" style="background: #1A365D;"></div>
+                    <span>Navy 900<br>#1A365D</span>
+                </div>
+                <div class="color-item">
+                    <div class="color-swatch" style="background: #2C5282;"></div>
+                    <span>Navy 800<br>#2C5282</span>
+                </div>
+                <div class="color-item">
+                    <div class="color-swatch" style="background: #F6AD55;"></div>
+                    <span>Orange 400<br>#F6AD55</span>
+                </div>
+                <div class="color-item">
+                    <div class="color-swatch" style="background: #ED8936;"></div>
+                    <span>Orange 500<br>#ED8936</span>
+                </div>
+                <div class="color-item">
+                    <div class="color-swatch" style="background: #F7F5F0; border: 1px solid #E6E2D8;"></div>
+                    <span>Warm White<br>#F7F5F0</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Usage Guidelines -->
+        <div class="section">
+            <h2>📖 Usage Guidelines</h2>
+            
+            <table class="usage-table">
+                <thead>
+                    <tr>
+                        <th>Usage</th>
+                        <th>Logo File</th>
+                        <th>Size</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Website Header</td>
+                        <td>logo.svg</td>
+                        <td>200px</td>
+                        <td>Full logo with tagline</td>
+                    </tr>
+                    <tr>
+                        <td>Mobile Header</td>
+                        <td>logo.svg</td>
+                        <td>120px</td>
+                        <td>May hide tagline on small screens</td>
+                    </tr>
+                    <tr>
+                        <td>Favicon</td>
+                        <td>logo-icon.svg</td>
+                        <td>32x32px</td>
+                        <td>Icon only version</td>
+                    </tr>
+                    <tr>
+                        <td>App Icon</td>
+                        <td>logo-icon.svg</td>
+                        <td>512x512px</td>
+                        <td>iOS/Android app stores</td>
+                    </tr>
+                    <tr>
+                        <td>Social Media</td>
+                        <td>logo-icon.svg</td>
+                        <td>400x400px</td>
+                        <td>Profile pictures</td>
+                    </tr>
+                    <tr>
+                        <td>Dark Backgrounds</td>
+                        <td>logo-dark.svg</td>
+                        <td>Any</td>
+                        <td>Footer, modals, dark mode</td>
+                    </tr>
+                    <tr>
+                        <td>Print Materials</td>
+                        <td>logo-mono.svg</td>
+                        <td>Vector</td>
+                        <td>Business cards, letterhead</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3 style="margin-top: 30px;">React Component Usage:</h3>
+            <code style="display: block; background: #1A202C; color: #10B981; padding: 20px; border-radius: 8px; margin-top: 15px; font-family: 'Courier New', monospace;">
+import HirevionLogo from './components/HirevionLogo';<br><br>
+&lt;HirevionLogo size={200} showTagline={true} variant="default" /&gt;<br>
+&lt;HirevionLogo size={120} variant="dark" /&gt;<br>
+&lt;HirevionLogo size={64} showTagline={false} /&gt;
+            </code>
+        </div>
+        
+        <!-- Download Section -->
+        <div class="section" style="text-align: center;">
+            <h2>💾 Download All Assets</h2>
+            <p>All logo files are located in:</p>
+            <code style="background: #F2EFE9; padding: 10px 20px; border-radius: 4px; display: inline-block; margin: 15px 0;">
+                /FRONTEND/public/
+            </code>
+            <p style="margin-top: 15px; color: #718096;">
+                Files included:<br>
+                logo.svg | logo-icon.svg | logo-dark.svg | logo-mono.svg | HirevionLogo.js
+            </p>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2024 Hirevion. All brand assets reserved.</p>
+    </footer>
+</body>
+</html>

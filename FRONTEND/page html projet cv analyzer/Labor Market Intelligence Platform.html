@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="view-transition" content="same-origin">
+    <title>MarketLens - Professional Labor Intelligence</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#2C5282',
+                            900: '#1A365D',
+                        },
+                        warm: {
+                            white: '#F7F5F0',
+                            50: '#FDFBF7',
+                            100: '#F2EFE9',
+                            200: '#E6E2D8',
+                            gray: '#8B8680',
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['DM Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Icons -->
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F7F5F0;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D4D4D4;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8B8680;
+        }
+
+        /* Smooth Transitions */
+        @view-transition {
+            navigation: auto;
+        }
+        
+        /* Grain Overlay for Texture */
+        .bg-grain {
+            position: relative;
+        }
+        .bg-grain::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+        }
+        .content-relative {
+            position: relative;
+            z-index: 1;
+        }
+
+        .paper-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03), 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Container -->
+    <div class="min-h-screen bg-warm-white text-gray-800 font-sans selection:bg-navy-800 selection:text-white">
+        
+        <!-- Navigation -->
+        <nav class="fixed w-full z-50 transition-all duration-300 bg-warm-white/90 backdrop-blur-md border-b border-warm-200" id="main-nav">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-20">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-navy-800 rounded-sm flex items-center justify-center text-white">
+                            <iconify-icon icon="lucide:bar-chart-big" width="20"></iconify-icon>
+                        </div>
+                        <span class="font-serif text-xl font-bold text-navy-900 tracking-tight">MarketLens</span>
+                    </div>
+                    
+                    <div class="hidden md:flex space-x-8">
+                        <a href="#" id="nav-candidates" class="text-gray-600 hover:text-navy-800 font-medium transition-colors text-sm uppercase tracking-wider">For Candidates</a>
+                        <a href="#" id="nav-recruiters" class="text-gray-600 hover:text-navy-800 font-medium transition-colors text-sm uppercase tracking-wider">For Recruiters</a>
+                        <a href="#" id="nav-methodology" class="text-gray-600 hover:text-navy-800 font-medium transition-colors text-sm uppercase tracking-wider">Methodology</a>
+                    </div>
+
+                    <div class="flex items-center space-x-4">
+                        <a href="#" id="nav-login" class="text-navy-800 font-medium hover:text-navy-900">Sign In</a>
+                        <a href="#" id="nav-demo" class="bg-navy-800 text-white px-5 py-2.5 rounded-sm hover:bg-navy-900 transition-all shadow-sm hover:shadow-md font-medium text-sm">Get Started</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="pt-32 pb-20 lg:pt-40 lg:pb-32 bg-grain overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 content-relative">
+                <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+                    
+                    <!-- Hero Text -->
+                    <div class="gsap-hero-text">
+                        <div class="inline-flex items-center space-x-2 bg-warm-200/50 border border-warm-200 px-3 py-1 rounded-full mb-8">
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            <span class="text-xs font-semibold tracking-wide text-navy-900 uppercase">Q3 Market Report Available</span>
+                        </div>
+                        <h1 class="font-serif text-5xl lg:text-7xl font-semibold text-navy-900 leading-[1.1] mb-6">
+                            Make better career & hiring decisions.
+                        </h1>
+                        <p class="text-xl text-gray-600 mb-10 leading-relaxed max-w-lg">
+                            Analyze CVs, evaluate job fit, and understand market expectations with data-driven precision. No guesswork, just clarity.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <a href="#" id="hero-cta-candidate" class="flex items-center justify-center gap-3 bg-navy-800 text-white px-8 py-4 rounded-sm hover:bg-navy-900 transition-all shadow-lg hover:shadow-xl group">
+                                <span class="font-medium">Analyze My CV</span>
+                                <iconify-icon icon="lucide:arrow-right" class="group-hover:translate-x-1 transition-transform"></iconify-icon>
+                            </a>
+                            <a href="#" id="hero-cta-recruiter" class="flex items-center justify-center gap-3 bg-white border border-warm-200 text-navy-900 px-8 py-4 rounded-sm hover:bg-warm-50 transition-all shadow-sm hover:shadow-md">
+                                <span class="font-medium">Analyze Candidates</span>
+                            </a>
+                        </div>
+                        <div class="mt-8 flex items-center gap-4 text-sm text-gray-500">
+                            <div class="flex -space-x-2">
+                                <div class="w-8 h-8 rounded-full bg-gray-200 border-2 border-white"></div>
+                                <div class="w-8 h-8 rounded-full bg-gray-300 border-2 border-white"></div>
+                                <div class="w-8 h-8 rounded-full bg-gray-400 border-2 border-white"></div>
+                            </div>
+                            <span>Trusted by 10,000+ professionals</span>
+                        </div>
+                    </div>
+
+                    <!-- Hero Visuals - Abstracted Documents -->
+                    <div class="relative h-[600px] w-full hidden lg:block gsap-hero-visual">
+                        <!-- Decorative background circle -->
+                        <div class="absolute top-10 right-10 w-[500px] h-[500px] rounded-full bg-warm-200/40 blur-3xl"></div>
+
+                        <!-- Card 1: Candidate Report (Left, Back) -->
+                        <div class="absolute top-20 left-0 w-[400px] bg-white rounded-md paper-shadow p-6 border border-warm-200 transform -rotate-3 transition-transform hover:rotate-0 duration-500 z-10">
+                            <div class="flex justify-between items-center mb-6 border-b border-warm-100 pb-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-warm-100 rounded-full flex items-center justify-center text-navy-800">
+                                        <iconify-icon icon="lucide:user" width="20"></iconify-icon>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-bold text-navy-900">Alex Chen</div>
+                                        <div class="text-xs text-gray-500">Senior Product Manager</div>
+                                    </div>
+                                </div>
+                                <div class="px-2 py-1 bg-green-50 text-green-700 text-xs font-bold rounded">Top 5% Match</div>
+                            </div>
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="flex justify-between text-xs font-medium text-gray-600 mb-1">
+                                        <span>Technical Expertise</span>
+                                        <span>92/100</span>
+                                    </div>
+                                    <div class="w-full bg-warm-100 rounded-full h-1.5">
+                                        <div class="bg-navy-800 h-1.5 rounded-full" style="width: 92%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-xs font-medium text-gray-600 mb-1">
+                                        <span>Leadership</span>
+                                        <span>88/100</span>
+                                    </div>
+                                    <div class="w-full bg-warm-100 rounded-full h-1.5">
+                                        <div class="bg-navy-800 h-1.5 rounded-full" style="width: 88%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-xs font-medium text-gray-600 mb-1">
+                                        <span>Market Demand</span>
+                                        <span>Very High</span>
+                                    </div>
+                                    <div class="flex gap-1 mt-2">
+                                        <span class="px-2 py-1 bg-warm-50 border border-warm-200 rounded text-[10px] text-gray-600">Product Strategy</span>
+                                        <span class="px-2 py-1 bg-warm-50 border border-warm-200 rounded text-[10px] text-gray-600">Data Analysis</span>
+                                        <span class="px-2 py-1 bg-warm-50 border border-warm-200 rounded text-[10px] text-gray-600">Agile</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Market Insights (Right, Front) -->
+                        <div class="absolute top-40 right-4 w-[380px] bg-white rounded-md paper-shadow p-6 border border-warm-200 z-20">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="font-serif font-bold text-navy-900">Salary Benchmark</h3>
+                                <iconify-icon icon="lucide:trending-up" class="text-green-600"></iconify-icon>
+                            </div>
+                            <div class="flex items-end gap-2 h-32 mb-4 px-2">
+                                <div class="w-1/5 bg-warm-100 rounded-t-sm h-[40%]"></div>
+                                <div class="w-1/5 bg-warm-100 rounded-t-sm h-[60%]"></div>
+                                <div class="w-1/5 bg-navy-800 rounded-t-sm h-[85%] relative group">
+                                    <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-navy-900 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Market Avg</div>
+                                </div>
+                                <div class="w-1/5 bg-warm-100 rounded-t-sm h-[70%]"></div>
+                                <div class="w-1/5 bg-warm-100 rounded-t-sm h-[50%]"></div>
+                            </div>
+                            <div class="flex justify-between text-xs text-gray-500 border-t border-warm-100 pt-3">
+                                <span>Junior</span>
+                                <span>Mid</span>
+                                <span class="font-bold text-navy-800">Senior</span>
+                                <span>Lead</span>
+                                <span>Exec</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Editorial Section: Candidates -->
+        <section class="py-24 bg-white border-y border-warm-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col lg:flex-row gap-16 items-center">
+                    <div class="lg:w-1/2 order-2 lg:order-1 relative gsap-fade-in">
+                         <div class="aspect-[4/3] bg-warm-100 rounded-sm overflow-hidden relative border border-warm-200">
+                            <!-- Abstract UI Representation -->
+                            <div class="absolute inset-0 p-8 flex flex-col">
+                                <div class="w-full h-8 bg-white border border-warm-200 mb-4 rounded-sm flex items-center px-4">
+                                    <div class="w-24 h-2 bg-gray-200 rounded-full"></div>
+                                </div>
+                                <div class="flex-1 flex gap-4">
+                                    <div class="w-1/3 bg-white border border-warm-200 h-full rounded-sm p-4 space-y-3">
+                                        <div class="w-12 h-12 bg-navy-50 rounded-full mb-2"></div>
+                                        <div class="w-full h-2 bg-gray-100 rounded-full"></div>
+                                        <div class="w-2/3 h-2 bg-gray-100 rounded-full"></div>
+                                        <div class="w-full h-20 bg-gray-50 rounded-sm mt-4"></div>
+                                    </div>
+                                    <div class="w-2/3 bg-white border border-warm-200 h-full rounded-sm p-6">
+                                        <div class="flex justify-between items-end mb-6">
+                                            <div class="space-y-2">
+                                                <div class="w-32 h-4 bg-navy-800 rounded-sm"></div>
+                                                <div class="w-20 h-2 bg-gray-300 rounded-sm"></div>
+                                            </div>
+                                            <div class="text-4xl font-serif text-navy-800">A</div>
+                                        </div>
+                                        <div class="space-y-4">
+                                            <div class="flex items-center gap-3">
+                                                <iconify-icon icon="lucide:check-circle" class="text-green-600 text-lg"></iconify-icon>
+                                                <span class="text-sm text-gray-600">Keyword Optimization</span>
+                                            </div>
+                                            <div class="flex items-center gap-3">
+                                                <iconify-icon icon="lucide:check-circle" class="text-green-600 text-lg"></iconify-icon>
+                                                <span class="text-sm text-gray-600">Executive Summary Clarity</span>
+                                            </div>
+                                            <div class="flex items-center gap-3">
+                                                <iconify-icon icon="lucide:alert-circle" class="text-orange-500 text-lg"></iconify-icon>
+                                                <span class="text-sm text-gray-600">Quantifiable Impact Metrics</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                         </div>
+                    </div>
+                    <div class="lg:w-1/2 order-1 lg:order-2 gsap-fade-in">
+                        <div class="inline-block px-3 py-1 bg-warm-100 text-navy-800 text-xs font-bold uppercase tracking-widest mb-4">For Candidates</div>
+                        <h2 class="font-serif text-4xl lg:text-5xl text-navy-900 mb-6 leading-tight">Know your true market value.</h2>
+                        <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+                            Don't rely on guesswork. Our platform dissects your CV against thousands of successful profiles in your industry to highlight exactly what recruiters are looking for.
+                        </p>
+                        <ul class="space-y-4 mb-8">
+                            <li class="flex items-start gap-4">
+                                <div class="mt-1 p-1 bg-navy-50 rounded text-navy-800">
+                                    <iconify-icon icon="lucide:search"></iconify-icon>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-navy-900">Gap Analysis</h4>
+                                    <p class="text-sm text-gray-600">Identify missing keywords and skills holding you back.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-4">
+                                <div class="mt-1 p-1 bg-navy-50 rounded text-navy-800">
+                                    <iconify-icon icon="lucide:trending-up"></iconify-icon>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-navy-900">Compensation Intelligence</h4>
+                                    <p class="text-sm text-gray-600">Real-time salary data based on your specific experience level.</p>
+                                </div>
+                            </li>
+                        </ul>
+                        <a href="#" id="btn-candidate-learn" class="text-navy-800 font-semibold border-b-2 border-navy-800 pb-1 hover:text-navy-600 hover:border-navy-600 transition-all inline-flex items-center gap-2">
+                            Start Evaluation <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Editorial Section: Recruiters -->
+        <section class="py-24 bg-warm-white bg-grain">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col lg:flex-row gap-16 items-center">
+                    <div class="lg:w-1/2 gsap-fade-in">
+                        <div class="inline-block px-3 py-1 bg-warm-200 text-navy-800 text-xs font-bold uppercase tracking-widest mb-4">For Recruiters & HR</div>
+                        <h2 class="font-serif text-4xl lg:text-5xl text-navy-900 mb-6 leading-tight">Standardize your evaluation process.</h2>
+                        <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+                            Move beyond gut feeling. Create structured, unbiased comparisons of candidates based on validated skill markers and experience patterns.
+                        </p>
+                        <div class="grid grid-cols-2 gap-6 mb-8">
+                            <div class="bg-white p-5 rounded-sm border border-warm-200 shadow-sm">
+                                <div class="text-3xl font-serif text-navy-800 mb-2">40%</div>
+                                <div class="text-sm text-gray-500 leading-snug">Reduction in time-to-shortlist</div>
+                            </div>
+                            <div class="bg-white p-5 rounded-sm border border-warm-200 shadow-sm">
+                                <div class="text-3xl font-serif text-navy-800 mb-2">2x</div>
+                                <div class="text-sm text-gray-500 leading-snug">Improvement in interview quality</div>
+                            </div>
+                        </div>
+                        <a href="#" id="btn-recruiter-learn" class="text-navy-800 font-semibold border-b-2 border-navy-800 pb-1 hover:text-navy-600 hover:border-navy-600 transition-all inline-flex items-center gap-2">
+                            View Dashboard Demo <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                        </a>
+                    </div>
+                    
+                    <div class="lg:w-1/2 relative gsap-fade-in">
+                        <!-- Complex Table Visual -->
+                        <div class="bg-white rounded-md shadow-lg border border-warm-200 overflow-hidden">
+                            <div class="bg-navy-800 text-white px-6 py-4 flex justify-between items-center">
+                                <span class="font-medium">Senior Designer - Shortlist</span>
+                                <iconify-icon icon="lucide:more-horizontal"></iconify-icon>
+                            </div>
+                            <div class="p-6">
+                                <table class="w-full text-sm text-left">
+                                    <thead class="text-xs text-gray-400 uppercase border-b border-warm-100">
+                                        <tr>
+                                            <th class="pb-3 font-medium">Candidate</th>
+                                            <th class="pb-3 font-medium">Score</th>
+                                            <th class="pb-3 font-medium">Exp</th>
+                                            <th class="pb-3 font-medium text-right">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-warm-100">
+                                        <tr class="group hover:bg-warm-50 transition-colors">
+                                            <td class="py-4">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs">JD</div>
+                                                    <span class="font-medium text-gray-800">J. Doe</span>
+                                                </div>
+                                            </td>
+                                            <td class="py-4">
+                                                <span class="inline-block px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-bold">94%</span>
+                                            </td>
+                                            <td class="py-4 text-gray-500">8y</td>
+                                            <td class="py-4 text-right">
+                                                <button class="text-navy-800 hover:bg-navy-50 px-3 py-1 rounded border border-warm-200 text-xs transition-colors">View</button>
+                                            </td>
+                                        </tr>
+                                        <tr class="group hover:bg-warm-50 transition-colors">
+                                            <td class="py-4">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xs">MK</div>
+                                                    <span class="font-medium text-gray-800">M. Kim</span>
+                                                </div>
+                                            </td>
+                                            <td class="py-4">
+                                                <span class="inline-block px-2 py-1 bg-green-50 text-green-600 rounded text-xs font-bold">88%</span>
+                                            </td>
+                                            <td class="py-4 text-gray-500">6y</td>
+                                            <td class="py-4 text-right">
+                                                <button class="text-navy-800 hover:bg-navy-50 px-3 py-1 rounded border border-warm-200 text-xs transition-colors">View</button>
+                                            </td>
+                                        </tr>
+                                        <tr class="group hover:bg-warm-50 transition-colors">
+                                            <td class="py-4">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-xs">AS</div>
+                                                    <span class="font-medium text-gray-800">A. Smith</span>
+                                                </div>
+                                            </td>
+                                            <td class="py-4">
+                                                <span class="inline-block px-2 py-1 bg-yellow-50 text-yellow-600 rounded text-xs font-bold">76%</span>
+                                            </td>
+                                            <td class="py-4 text-gray-500">4y</td>
+                                            <td class="py-4 text-right">
+                                                <button class="text-navy-800 hover:bg-navy-50 px-3 py-1 rounded border border-warm-200 text-xs transition-colors">View</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Steps / Process Section -->
+        <section class="py-24 bg-navy-900 text-warm-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-2xl mx-auto mb-16">
+                    <h2 class="font-serif text-3xl lg:text-4xl font-medium mb-4">How the Platform Works</h2>
+                    <p class="text-navy-200/80">A transparent, secure workflow designed for professional clarity.</p>
+                </div>
+
+                <div class="grid md:grid-cols-4 gap-8">
+                    <!-- Step 1 -->
+                    <div class="group cursor-pointer">
+                        <div class="w-12 h-12 border border-warm-white/20 rounded-sm flex items-center justify-center mb-6 group-hover:bg-warm-white/10 transition-colors">
+                            <span class="font-serif text-xl">1</span>
+                        </div>
+                        <h3 class="text-lg font-bold mb-3">Upload Documents</h3>
+                        <p class="text-sm text-warm-white/60 leading-relaxed">Securely upload CVs, job descriptions, or team portfolios in any standard format.</p>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="group cursor-pointer">
+                        <div class="w-12 h-12 border border-warm-white/20 rounded-sm flex items-center justify-center mb-6 group-hover:bg-warm-white/10 transition-colors">
+                            <span class="font-serif text-xl">2</span>
+                        </div>
+                        <h3 class="text-lg font-bold mb-3">Processing</h3>
+                        <p class="text-sm text-warm-white/60 leading-relaxed">Our system parses structure, extracts key competencies, and anonymizes sensitive PII.</p>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="group cursor-pointer">
+                        <div class="w-12 h-12 border border-warm-white/20 rounded-sm flex items-center justify-center mb-6 group-hover:bg-warm-white/10 transition-colors">
+                            <span class="font-serif text-xl">3</span>
+                        </div>
+                        <h3 class="text-lg font-bold mb-3">Market Analysis</h3>
+                        <p class="text-sm text-warm-white/60 leading-relaxed">Data is benchmarked against 5M+ real-time market data points for accuracy.</p>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="group cursor-pointer">
+                        <div class="w-12 h-12 border border-warm-white/20 rounded-sm flex items-center justify-center mb-6 group-hover:bg-warm-white/10 transition-colors">
+                            <span class="font-serif text-xl">4</span>
+                        </div>
+                        <h3 class="text-lg font-bold mb-3">Actionable Insights</h3>
+                        <p class="text-sm text-warm-white/60 leading-relaxed">Receive a comprehensive report with clear scoring, gaps, and recommendations.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Trust & Transparency -->
+        <section class="py-24 bg-white">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <iconify-icon icon="lucide:shield-check" class="text-4xl text-navy-800 mb-6"></iconify-icon>
+                <h2 class="font-serif text-4xl text-navy-900 mb-8">Human decisions, supported by data.</h2>
+                <p class="text-lg text-gray-600 mb-12 leading-relaxed">
+                    We believe technology should illuminate the labor market, not automate the human connection. Our scoring algorithms are open-source and audited for bias, ensuring that every insight we provide is transparent, explainable, and fair.
+                </p>
+                <div class="grid sm:grid-cols-3 gap-8 border-t border-warm-200 pt-12 text-left">
+                    <div>
+                        <h4 class="font-bold text-navy-900 mb-2">Explainable Metrics</h4>
+                        <p class="text-sm text-gray-500">Every score comes with a "Why" breakdown, referencing specific document evidence.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-navy-900 mb-2">Privacy First</h4>
+                        <p class="text-sm text-gray-500">GDPR & CCPA compliant. Your data is encrypted and never shared with third parties.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-navy-900 mb-2">Bias Monitoring</h4>
+                        <p class="text-sm text-gray-500">Continuous auditing ensures demographics do not influence capability scoring.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="py-20 bg-warm-50 border-t border-warm-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-navy-800 rounded-sm p-10 lg:p-16 flex flex-col lg:flex-row items-center justify-between gap-10 text-white relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
+                    <div class="relative z-10">
+                        <h2 class="font-serif text-3xl lg:text-4xl mb-4">Ready to analyze your position?</h2>
+                        <p class="text-navy-100 max-w-lg">Upload your first document today. No credit card required for initial analysis.</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-4 relative z-10">
+                        <a href="#" id="cta-footer-start" class="bg-white text-navy-900 px-8 py-3 rounded-sm font-medium hover:bg-warm-50 transition-colors shadow-lg text-center">
+                            Start Free Analysis
+                        </a>
+                        <a href="#" id="cta-footer-demo" class="border border-white/30 text-white px-8 py-3 rounded-sm font-medium hover:bg-white/10 transition-colors text-center">
+                            Request Enterprise Demo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-warm-white pt-16 pb-8 border-t border-warm-200 text-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
+                    <div class="col-span-2 lg:col-span-2">
+                        <div class="flex items-center gap-2 mb-6">
+                            <div class="w-6 h-6 bg-navy-800 rounded-sm flex items-center justify-center text-white">
+                                <iconify-icon icon="lucide:bar-chart-big" width="14"></iconify-icon>
+                            </div>
+                            <span class="font-serif text-lg font-bold text-navy-900">MarketLens</span>
+                        </div>
+                        <p class="text-gray-500 max-w-xs mb-6">
+                            Providing transparency and data-driven insights for the modern labor market. Empowering professionals and hiring teams since 2023.
+                        </p>
+                        <div class="flex gap-4">
+                            <a href="#" id="social-li" class="text-gray-400 hover:text-navy-800 transition-colors"><iconify-icon icon="lucide:linkedin"></iconify-icon></a>
+                            <a href="#" id="social-tw" class="text-gray-400 hover:text-navy-800 transition-colors"><iconify-icon icon="lucide:twitter"></iconify-icon></a>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-bold text-navy-900 mb-4">Platform</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#" id="footer-candidates" class="text-gray-600 hover:text-navy-800 transition-colors">For Candidates</a></li>
+                            <li><a href="#" id="footer-recruiters" class="text-gray-600 hover:text-navy-800 transition-colors">For Recruiters</a></li>
+                            <li><a href="#" id="footer-pricing" class="text-gray-600 hover:text-navy-800 transition-colors">Pricing</a></li>
+                            <li><a href="#" id="footer-api" class="text-gray-600 hover:text-navy-800 transition-colors">API Access</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-navy-900 mb-4">Company</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#" id="footer-about" class="text-gray-600 hover:text-navy-800 transition-colors">About Us</a></li>
+                            <li><a href="#" id="footer-methodology" class="text-gray-600 hover:text-navy-800 transition-colors">Methodology</a></li>
+                            <li><a href="#" id="footer-careers" class="text-gray-600 hover:text-navy-800 transition-colors">Careers</a></li>
+                            <li><a href="#" id="footer-contact" class="text-gray-600 hover:text-navy-800 transition-colors">Contact</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-navy-900 mb-4">Legal</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#" id="footer-privacy" class="text-gray-600 hover:text-navy-800 transition-colors">Privacy Policy</a></li>
+                            <li><a href="#" id="footer-terms" class="text-gray-600 hover:text-navy-800 transition-colors">Terms of Service</a></li>
+                            <li><a href="#" id="footer-security" class="text-gray-600 hover:text-navy-800 transition-colors">Security</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="pt-8 border-t border-warm-200 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-400">
+                    <p>&copy; 2024 MarketLens Intelligence Inc. All rights reserved.</p>
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                        <span>Systems Operational</span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Interactions -->
+    <script>
+        // Navigation Scroll Effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('main-nav');
+            if (window.scrollY > 10) {
+                nav.classList.add('shadow-sm');
+            } else {
+                nav.classList.remove('shadow-sm');
+            }
+        });
+
+        // GSAP Animations
+        document.addEventListener('DOMContentLoaded', () => {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Hero Text Stagger
+            gsap.from(".gsap-hero-text > *", {
+                y: 30,
+                opacity: 0,
+                duration: 1,
+                stagger: 0.1,
+                ease: "power3.out"
+            });
+
+            // Hero Visual Entry
+            gsap.from(".gsap-hero-visual", {
+                x: 50,
+                opacity: 0,
+                duration: 1.2,
+                delay: 0.3,
+                ease: "power3.out"
+            });
+
+            // Section Fade Ins
+            const fadeElements = document.querySelectorAll('.gsap-fade-in');
+            fadeElements.forEach(el => {
+                gsap.from(el, {
+                    scrollTrigger: {
+                        trigger: el,
+                        start: "top 85%",
+                        toggleActions: "play none none reverse"
+                    },
+                    y: 40,
+                    opacity: 0,
+                    duration: 0.8,
+                    ease: "power3.out"
+                });
+            });
+        });
+    </script>
+</body>
+</html>
