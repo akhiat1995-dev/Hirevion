@@ -82,6 +82,15 @@ async def get_all_cvs():
         cvs.append(cv)
     return cvs
 
+async def get_user_cvs(user_id: str):
+    """Get only the CVs belonging to a specific user."""
+    db = get_db()
+    cvs = []
+    async for cv in db.cvs.find({"user_id": user_id}):
+        cv["id"] = str(cv.pop("_id"))
+        cvs.append(cv)
+    return cvs
+
 async def get_cv_by_id(cv_id: str):
     """Get a CV by ID."""
     from bson.objectid import ObjectId
@@ -105,10 +114,19 @@ async def save_job(job_data: dict):
     return str(result.inserted_id)
 
 async def get_all_jobs():
-    """Get all job postings from database."""
+    """Get all job postings from database (deprecated - use get_user_jobs)."""
     db = get_db()
     jobs = []
     async for job in db.jobs.find():
+        job["id"] = str(job.pop("_id"))
+        jobs.append(job)
+    return jobs
+
+async def get_user_jobs(user_id: str):
+    """Get only the jobs belonging to a specific user."""
+    db = get_db()
+    jobs = []
+    async for job in db.jobs.find({"user_id": user_id}):
         job["id"] = str(job.pop("_id"))
         jobs.append(job)
     return jobs
@@ -122,10 +140,19 @@ async def save_recruiter_application(cv_data: dict):
     return str(result.inserted_id)
 
 async def get_all_recruiter_applications():
-    """Get all recruiter applications from database."""
+    """Get all recruiter applications from database (deprecated - use get_user_recruiter_applications)."""
     db = get_db()
     applications = []
     async for app in db.recruiter_applications.find():
+        app["id"] = str(app.pop("_id"))
+        applications.append(app)
+    return applications
+
+async def get_user_recruiter_applications(user_id: str):
+    """Get only the recruiter applications belonging to a specific user."""
+    db = get_db()
+    applications = []
+    async for app in db.recruiter_applications.find({"user_id": user_id}):
         app["id"] = str(app.pop("_id"))
         applications.append(app)
     return applications
@@ -240,10 +267,19 @@ async def save_hiring_session(session_data: dict):
     return str(result.inserted_id)
 
 async def get_all_hiring_sessions():
-    """Get all hiring sessions."""
+    """Get all hiring sessions (deprecated - use get_user_hiring_sessions)."""
     db = get_db()
     sessions = []
     async for session in db.hiring_sessions.find().sort("created_at", -1):
+        session["id"] = str(session.pop("_id"))
+        sessions.append(session)
+    return sessions
+
+async def get_user_hiring_sessions(user_id: str):
+    """Get only the hiring sessions belonging to a specific user."""
+    db = get_db()
+    sessions = []
+    async for session in db.hiring_sessions.find({"user_id": user_id}).sort("created_at", -1):
         session["id"] = str(session.pop("_id"))
         sessions.append(session)
     return sessions
@@ -269,3 +305,105 @@ async def clear_all_hiring_sessions() -> int:
     db = get_db()
     result = await db.hiring_sessions.delete_many({})
     return result.deleted_count
+
+
+# ============ USER AUTHENTICATION ============
+
+async def save_user(user_data: dict):
+    """Save a new user to database."""
+    db = get_db()
+    result = await db.users.insert_one(user_data)
+    return str(result.inserted_id)
+
+
+async def get_user_by_email(email: str):
+    """Get a user by email."""
+    db = get_db()
+    user = await db.users.find_one({"email": email})
+    if user:
+        user["id"] = str(user.pop("_id"))
+    return user
+
+
+async def get_user_by_id(user_id: str):
+    """Get a user by ID."""
+    from bson.objectid import ObjectId
+    db = get_db()
+    user = await db.users.find_one({"_id": ObjectId(user_id)})
+    if user:
+        user["id"] = str(user.pop("_id"))
+    return user
+
+
+async def update_user_last_login(user_id: str):
+    """Update user's last login timestamp."""
+    from bson.objectid import ObjectId
+    from datetime import datetime
+    db = get_db()
+    await db.users.update_one(
+        {"_id": ObjectId(user_id)},
+        {"$set": {"last_login": datetime.utcnow()}}
+    )
+
+
+async def update_user(user_id: str, user_data: dict) -> bool:
+    """Update user data. Returns True if updated, False if not found."""
+    from bson.objectid import ObjectId
+    db = get_db()
+    user_data.pop("id", None)
+    result = await db.users.update_one(
+        {"_id": ObjectId(user_id)},
+        {"$set": user_data}
+    )
+    return result.modified_count > 0
+
+
+async def delete_user_by_id(user_id: str) -> bool:
+    """Delete user and all their associated data."""
+    from bson.objectid import ObjectId
+    db = get_db()
+    
+    # Delete user
+    user_result = await db.users.delete_one({"_id": ObjectId(user_id)})
+    
+    # Delete user's CVs
+    await db.cvs.delete_many({"user_id": user_id})
+    
+    # Delete user's recruiter applications
+    await db.recruiter_applications.delete_many({"user_id": user_id})
+    
+    # Delete user's jobs
+    await db.jobs.delete_many({"user_id": user_id})
+    
+    # Delete user's hiring sessions
+    await db.hiring_sessions.delete_many({"user_id": user_id})
+    
+    return user_result.deleted_count > 0
+
+
+async def update_hiring_session_notes(session_id: str, notes_data: dict) -> bool:
+    """Update notes on a hiring session or specific candidate."""
+    from bson.objectid import ObjectId
+    db = get_db()
+    
+    if "candidate_id" in notes_data and "note" in notes_data:
+        # Note on a specific candidate
+        result = await db.hiring_sessions.update_one(
+            {"_id": ObjectId(session_id), "approved_candidates.cv_id": notes_data["candidate_id"]},
+            {"$set": {"approved_candidates.$.note": notes_data["note"]}}
+        )
+        if result.modified_count == 0:
+            result = await db.hiring_sessions.update_one(
+                {"_id": ObjectId(session_id), "rejected_candidates.cv_id": notes_data["candidate_id"]},
+                {"$set": {"rejected_candidates.$.note": notes_data["note"]}}
+            )
+        return result.modified_count > 0
+    elif "session_note" in notes_data:
+        # Note on the entire session
+        result = await db.hiring_sessions.update_one(
+            {"_id": ObjectId(session_id)},
+            {"$set": {"session_note": notes_data["session_note"]}}
+        )
+        return result.modified_count > 0
+    
+    return False

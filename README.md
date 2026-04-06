@@ -1,5 +1,4 @@
 # Hirevion - CV Analyzer Pro
-
 <p align="center">
   <img src="FRONTEND/public/logo192.png" alt="Hirevion Logo" width="80" height="80">
 </p>

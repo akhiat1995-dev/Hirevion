@@ -1,4 +1,3 @@
-import os
 import sys
 from pathlib import Path
 
@@ -8,21 +7,21 @@ sys.path.insert(0, str(backend_dir))
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from dotenv import load_dotenv
-from routers import candidate, recruiter
+from routers import candidate, recruiter, auth
 from config.database import connect_db, close_db, get_statistics
+from config.settings import settings
 
-load_dotenv()
+# Validate settings at startup
+settings.validate_all()
 
 app = FastAPI(
-    title="Hirevion",
-    description="AI-powered recruitment and talent matching platform",
-    version="1.0.0"
+    title=settings.APP_NAME,
+    description=settings.APP_DESCRIPTION,
+    version=settings.APP_VERSION
 )
 
-# CORS - Use environment variable or default to localhost
-origins_str = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000")
-origins = [origin.strip() for origin in origins_str.split(",")]
+# CORS - Use centralized settings
+origins = settings.allowed_origins_list
 
 app.add_middleware(
     CORSMiddleware,
@@ -42,6 +41,7 @@ async def shutdown_event():
     """Close database connection on shutdown."""
     await close_db()
 
+app.include_router(auth.router)
 app.include_router(candidate.router)
 app.include_router(recruiter.router)
 

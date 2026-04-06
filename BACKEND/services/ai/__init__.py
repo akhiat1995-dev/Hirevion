@@ -1,13 +1,3 @@
-"""
-Backward compatibility module.
-
-All AI logic has been moved to services/ai/ subdirectory.
-This file re-exports everything for existing code that imports from services.agent.
-
-New code should import directly from services.ai:
-    from services.ai import parse_cv_with_ai, match_candidate_to_job, ...
-"""
-
 from services.ai.client import groq_client, GroqClient
 from services.ai.prompts import SYSTEM_PROMPT_CV, SYSTEM_PROMPT_JOB_PROFILE, SYSTEM_PROMPT_HIRING_MATCH
 from services.ai.skill_map import SKILL_SIMILARITY_MAP, find_similar_skills

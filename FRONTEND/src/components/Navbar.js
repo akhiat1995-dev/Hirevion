@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Rocket, Upload, Users, Pencil, ChevronRight } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, X, Rocket, Upload, Users, Pencil, ChevronRight, LogOut, User } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
+  const { user, isAuthenticated, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showRoleModal, setShowRoleModal] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,6 +21,16 @@ const Navbar = () => {
   }, []);
 
   const isActive = (path) => location.pathname === path;
+
+  const handleLogout = () => {
+    logout();
+    setShowUserMenu(false);
+    navigate('/');
+  };
+
+  const userInitials = user?.full_name
+    ? user.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+    : 'U';
 
   return (
     <>
@@ -107,33 +121,122 @@ const Navbar = () => {
             >
               Home
             </Link>
-            <Link 
-              to="/candidate" 
-              className={`text-sm uppercase tracking-wider font-medium transition-colors ${
-                isActive('/candidate') ? 'text-navy-800 font-bold border-b-2 border-navy-800' : 'text-gray-600 hover:text-navy-800'
-              }`}
-            >
-              For Candidates
-            </Link>
-            <Link 
-              to="/recruiter" 
-              className={`text-sm uppercase tracking-wider font-medium transition-colors ${
-                isActive('/recruiter') ? 'text-navy-800 font-bold border-b-2 border-navy-800' : 'text-gray-600 hover:text-navy-800'
-              }`}
-            >
-              For Recruiters
-            </Link>
+            {isAuthenticated ? (
+              user?.role === 'recruiter' ? (
+                <Link 
+                  to="/recruiter" 
+                  className={`text-sm uppercase tracking-wider font-medium transition-colors ${
+                    isActive('/recruiter') ? 'text-navy-800 font-bold border-b-2 border-navy-800' : 'text-gray-600 hover:text-navy-800'
+                  }`}
+                >
+                  Dashboard
+                </Link>
+              ) : (
+                <Link 
+                  to="/candidate" 
+                  className={`text-sm uppercase tracking-wider font-medium transition-colors ${
+                    isActive('/candidate') ? 'text-navy-800 font-bold border-b-2 border-navy-800' : 'text-gray-600 hover:text-navy-800'
+                  }`}
+                >
+                  My CVs
+                </Link>
+              )
+            ) : (
+              <>
+                <Link 
+                  to="/candidate" 
+                  className={`text-sm uppercase tracking-wider font-medium transition-colors ${
+                    isActive('/candidate') ? 'text-navy-800 font-bold border-b-2 border-navy-800' : 'text-gray-600 hover:text-navy-800'
+                  }`}
+                >
+                  For Candidates
+                </Link>
+                <Link 
+                  to="/recruiter" 
+                  className={`text-sm uppercase tracking-wider font-medium transition-colors ${
+                    isActive('/recruiter') ? 'text-navy-800 font-bold border-b-2 border-navy-800' : 'text-gray-600 hover:text-navy-800'
+                  }`}
+                >
+                  For Recruiters
+                </Link>
+              </>
+            )}
           </div>
 
           {/* CTA Button */}
           <div className="hidden md:flex items-center space-x-4">
-            <button 
-              onClick={() => setShowRoleModal(true)}
-              className="bg-navy-800 text-white px-5 py-2.5 rounded-sm hover:bg-navy-900 transition-all shadow-sm hover:shadow-md font-medium text-sm flex items-center gap-2"
-            >
-              <Rocket size={16} />
-              Get Started
-            </button>
+            {isAuthenticated ? (
+              <div className="relative">
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center gap-2 bg-navy-50 hover:bg-navy-100 px-4 py-2.5 rounded-sm transition-all font-medium text-sm text-navy-900"
+                >
+                  <div className="w-7 h-7 rounded-full bg-navy-800 text-white flex items-center justify-center text-xs font-bold">
+                    {userInitials}
+                  </div>
+                  <span className="truncate max-w-[120px]">{user?.full_name?.split(' ')[0]}</span>
+                </button>
+
+                {showUserMenu && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-warm-200 py-2 z-50">
+                    <div className="px-4 py-2 border-b border-warm-100">
+                      <p className="font-medium text-navy-900 text-sm">{user?.full_name}</p>
+                      <p className="text-xs text-gray-500">{user?.email}</p>
+                      <span className="inline-block mt-1 px-2 py-0.5 bg-orange-100 text-orange-700 text-xs rounded-full capitalize">
+                        {user?.role}
+                      </span>
+                    </div>
+                    {user?.role === 'recruiter' ? (
+                      <Link
+                        to="/recruiter"
+                        onClick={() => setShowUserMenu(false)}
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-navy-50"
+                      >
+                        <Users size={14} /> Dashboard
+                      </Link>
+                    ) : (
+                      <Link
+                        to="/candidate/dashboard"
+                        onClick={() => setShowUserMenu(false)}
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-navy-50"
+                      >
+                        <Upload size={14} /> My CVs
+                      </Link>
+                    )}
+                    <Link
+                      to="/profile"
+                      onClick={() => setShowUserMenu(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-navy-50"
+                    >
+                      <User size={14} /> Settings
+                    </Link>
+                    <hr className="my-1 border-warm-100" />
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                    >
+                      <LogOut size={14} /> Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="text-navy-800 font-medium text-sm hover:text-navy-900 transition-colors"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  to="/register"
+                  className="bg-navy-800 text-white px-5 py-2.5 rounded-sm hover:bg-navy-900 transition-all shadow-sm hover:shadow-md font-medium text-sm flex items-center gap-2"
+                >
+                  <Rocket size={16} />
+                  Get Started
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -156,28 +259,84 @@ const Navbar = () => {
               >
                 Home
               </Link>
-              <Link 
-                to="/candidate" 
-                className="text-gray-600 hover:text-navy-800 font-medium flex items-center gap-2"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <Upload size={16} />
-                For Candidates
-              </Link>
-              <Link 
-                to="/recruiter" 
-                className="text-gray-600 hover:text-navy-800 font-medium flex items-center gap-2"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <Users size={16} />
-                For Recruiters
-              </Link>
-              <button 
-                onClick={() => { setShowRoleModal(true); }}
-                className="bg-navy-800 text-white px-5 py-2.5 rounded-sm text-center font-medium"
-              >
-                Get Started
-              </button>
+
+              {isAuthenticated ? (
+                <>
+                  <div className="flex items-center gap-3 px-2 py-3 bg-navy-50 rounded-lg">
+                    <div className="w-9 h-9 rounded-full bg-navy-800 text-white flex items-center justify-center text-sm font-bold">
+                      {userInitials}
+                    </div>
+                    <div>
+                      <p className="font-medium text-navy-900 text-sm">{user?.full_name}</p>
+                      <p className="text-xs text-gray-500">{user?.email}</p>
+                    </div>
+                  </div>
+                  <Link 
+                    to="/candidate/dashboard" 
+                    className="text-gray-600 hover:text-navy-800 font-medium flex items-center gap-2"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Upload size={16} />
+                    My CVs
+                  </Link>
+                  <Link 
+                    to="/recruiter" 
+                    className="text-gray-600 hover:text-navy-800 font-medium flex items-center gap-2"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Users size={16} />
+                    Dashboard
+                  </Link>
+                  <Link 
+                    to="/profile" 
+                    className="text-gray-600 hover:text-navy-800 font-medium flex items-center gap-2"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <User size={16} />
+                    Settings
+                  </Link>
+                  <button 
+                    onClick={handleLogout}
+                    className="text-red-600 font-medium flex items-center gap-2"
+                  >
+                    <LogOut size={16} />
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link 
+                    to="/candidate" 
+                    className="text-gray-600 hover:text-navy-800 font-medium flex items-center gap-2"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Upload size={16} />
+                    For Candidates
+                  </Link>
+                  <Link 
+                    to="/recruiter" 
+                    className="text-gray-600 hover:text-navy-800 font-medium flex items-center gap-2"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Users size={16} />
+                    For Recruiters
+                  </Link>
+                  <Link 
+                    to="/login" 
+                    className="text-navy-800 font-medium text-center py-2"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Sign In
+                  </Link>
+                  <Link 
+                    to="/register" 
+                    className="bg-navy-800 text-white px-5 py-2.5 rounded-sm text-center font-medium"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Get Started
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}

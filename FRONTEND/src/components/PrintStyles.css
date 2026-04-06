@@ -1,0 +1,270 @@
+@media print {
+  @page {
+    size: A4;
+    margin: 0.8cm 1.2cm;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  /* ===== CANDIDATE REPORT ===== */
+  #candidate-report {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    font-size: 9pt !important;
+    line-height: 1.2 !important;
+  }
+
+  #candidate-report > * {
+    break-inside: avoid;
+  }
+
+  #candidate-report .p-8 { padding: 8pt !important; }
+  #candidate-report .p-6 { padding: 6pt !important; }
+  #candidate-report .p-4 { padding: 5pt !important; }
+  #candidate-report .p-3 { padding: 4pt !important; }
+
+  #candidate-report .mb-8 { margin-bottom: 6pt !important; }
+  #candidate-report .mb-6 { margin-bottom: 5pt !important; }
+  #candidate-report .mb-4 { margin-bottom: 4pt !important; }
+  #candidate-report .mb-3 { margin-bottom: 3pt !important; }
+  #candidate-report .mb-2 { margin-bottom: 2pt !important; }
+
+  #candidate-report .gap-6 { gap: 4pt !important; }
+  #candidate-report .gap-4 { gap: 4pt !important; }
+  #candidate-report .gap-3 { gap: 3pt !important; }
+  #candidate-report .gap-2 { gap: 2pt !important; }
+
+  #candidate-report .rounded-2xl { border-radius: 2pt !important; }
+  #candidate-report .rounded-xl { border-radius: 2pt !important; }
+  #candidate-report .rounded-lg { border-radius: 1pt !important; }
+
+  #candidate-report .section-card {
+    border: 0.5pt solid #d1d5db !important;
+    padding: 6pt !important;
+    margin-bottom: 4pt !important;
+    background: white !important;
+  }
+
+  #candidate-report h2 {
+    font-size: 10pt !important;
+    font-weight: bold !important;
+    margin: 6pt 0 4pt 0 !important;
+    padding-bottom: 2pt !important;
+    border-bottom: 0.5pt solid #e5e7eb !important;
+    color: #1e3a5f !important;
+  }
+
+  #candidate-report .hero-card {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    padding: 8pt !important;
+    border: 0.5pt solid #d1d5db !important;
+    background: white !important;
+    margin-bottom: 4pt !important;
+  }
+
+  #candidate-report .hero-score {
+    width: 50pt !important;
+    height: 50pt !important;
+    font-size: 14pt !important;
+    margin-right: 8pt !important;
+  }
+
+  #candidate-report .hero-info h1 {
+    font-size: 12pt !important;
+    margin: 0 0 2pt 0 !important;
+  }
+
+  #candidate-report .hero-tags span {
+    font-size: 7pt !important;
+    padding: 1pt 4pt !important;
+  }
+
+  #candidate-report .skill-tag {
+    font-size: 7pt !important;
+    padding: 1pt 4pt !important;
+    margin: 1pt !important;
+  }
+
+  #candidate-report .grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  #candidate-report .grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+
+  #candidate-report .score-item {
+    padding: 4pt !important;
+  }
+
+  #candidate-report .score-item .score {
+    font-size: 12pt !important;
+  }
+
+  #candidate-report .score-item .label {
+    font-size: 7pt !important;
+  }
+
+  #candidate-report .experience-item {
+    padding: 4pt !important;
+    margin-bottom: 2pt !important;
+  }
+
+  #candidate-report li {
+    font-size: 8pt !important;
+    margin-bottom: 2pt !important;
+  }
+
+  #candidate-report .strengths-box,
+  #candidate-report .weaknesses-box {
+    padding: 6pt !important;
+    margin-bottom: 4pt !important;
+  }
+
+  #candidate-report .ats-box {
+    padding: 6pt !important;
+    margin-bottom: 4pt !important;
+  }
+
+  #candidate-report .action-item {
+    padding: 4pt !important;
+    margin-bottom: 3pt !important;
+  }
+
+  #candidate-report .skill-gap-item {
+    padding: 4pt !important;
+    margin-bottom: 3pt !important;
+  }
+
+  #candidate-report .footer {
+    margin-top: 6pt !important;
+    padding-top: 4pt !important;
+    font-size: 7pt !important;
+  }
+
+  /* Remove gradients and shadows for print */
+  #candidate-report .bg-gradient-to-br,
+  #candidate-report .bg-gradient-to-r {
+    background: white !important;
+  }
+
+  #candidate-report .shadow-lg,
+  #candidate-report .shadow-md,
+  #candidate-report .shadow-sm {
+    box-shadow: none !important;
+  }
+
+  /* ===== RECRUITER RESULTS PAGE ===== */
+  #recruiter-report {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    font-size: 9pt !important;
+    line-height: 1.2 !important;
+  }
+
+  #recruiter-report > * {
+    break-inside: avoid;
+  }
+
+  #recruiter-report .mb-8 {
+    margin-bottom: 6pt !important;
+  }
+
+  #recruiter-report .mb-6 {
+    margin-bottom: 5pt !important;
+  }
+
+  #recruiter-report .p-6 {
+    padding: 6pt !important;
+  }
+
+  #recruiter-report .p-4 {
+    padding: 5pt !important;
+  }
+
+  #recruiter-report .gap-6 {
+    gap: 4pt !important;
+  }
+
+  #recruiter-report .grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  #recruiter-report .grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+
+  #recruiter-report .bg-white {
+    background: white !important;
+  }
+
+  #recruiter-report .shadow-lg,
+  #recruiter-report .shadow-md,
+  #recruiter-report .paper-shadow {
+    box-shadow: none !important;
+  }
+
+  #recruiter-report .border {
+    border: 0.5pt solid #d1d5db !important;
+  }
+
+  /* ===== HIDE NAV/HEADER ===== */
+  .sticky, .fixed, header, nav {
+    display: none !important;
+  }
+
+  .pt-28 {
+    padding-top: 0 !important;
+  }
+
+  /* ===== RECRUITER DASHBOARD PRINT ===== */
+  #session-detail-print {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 10pt !important;
+    background: white !important;
+    font-size: 9pt !important;
+    font-family: 'Arial', sans-serif !important;
+    line-height: 1.2 !important;
+  }
+
+  /* ===== PAGE NUMBERS ===== */
+  @page {
+    @bottom-center {
+      content: "Page " counter(page) " / " counter(pages);
+      font-size: 8pt;
+      color: #666;
+    }
+  }
+
+  /* ===== PAGE BREAK ===== */
+  .page-break {
+    page-break-after: always;
+  }
+
+  h1, h2, h3, h4 {
+    break-after: avoid;
+  }
+
+  /* ===== CHARTS ===== */
+  svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+}

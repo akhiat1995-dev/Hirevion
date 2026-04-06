@@ -84,9 +84,9 @@ const Results = () => {
   ] : [];
 
   return (
-    <div className="pt-28 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div className="pt-28 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto" id="recruiter-report">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 no-print">
         <div>
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
             <Link to="/recruiter" className="hover:text-navy-800">Dashboard</Link>

@@ -10,3 +10,5 @@ groq==0.13.1
 motor==3.6.0
 pymongo==4.9.2
 email-validator==2.2.0
+PyJWT==2.9.0
+bcrypt==4.2.0

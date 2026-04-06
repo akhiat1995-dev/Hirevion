@@ -1,46 +1,31 @@
 import os
 import tempfile
 from pathlib import Path
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 from fastapi.responses import JSONResponse
 from services.extractor import read_pdf
 from services.agent import parse_cv_with_ai
+from services.skill_gap import analyze_skill_gap
 from config.database import save_cv
+from config.settings import settings
+from utils.validators import validate_file_extension, validate_file_size, validate_text_content
+from utils.response import success_response, error_response
+from middleware.auth import get_current_user, require_role
 
 router = APIRouter(prefix="/candidate", tags=["Candidate"])
 
-ALLOWED_EXTENSIONS = {'.pdf', '.doc', '.docx'}
-MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
-
-def validate_file(file: UploadFile):
-    """Validate uploaded file."""
-    file_ext = Path(file.filename).suffix.lower()
-
-    if file_ext not in ALLOWED_EXTENSIONS:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid file type. Allowed: {', '.join(ALLOWED_EXTENSIONS)}"
-        )
-
-    return file_ext
-
 @router.post("/analyze")
-async def analyze_cv(file: UploadFile = File(...)):
+async def analyze_cv(file: UploadFile = File(...), current_user: dict = Depends(require_role("user", "recruiter"))):
     """
-    Upload and analyze a CV using AI.
+    Upload and analyze a CV using AI. Requires authentication.
     """
-    print(f"📥 Upload received: {file.filename}")
+    print(f"📥 Upload received: {file.filename} by user {current_user['id']}")
 
     try:
         # 1. Validate file
-        file_ext = validate_file(file)
+        file_ext = validate_file_extension(file, settings.allowed_extensions_set)
         content = await file.read()
-
-        if len(content) > MAX_FILE_SIZE:
-            raise HTTPException(
-                status_code=400,
-                detail=f"File too large. Max size: {MAX_FILE_SIZE / 1024 / 1024}MB"
-            )
+        validate_file_size(content, settings.MAX_FILE_SIZE)
 
         # 2. Save temporarily
         with tempfile.NamedTemporaryFile(delete=False, suffix=file_ext) as tmp:
@@ -52,19 +37,19 @@ async def analyze_cv(file: UploadFile = File(...)):
             if file_ext == '.pdf':
                 text = read_pdf(tmp_path)
             else:
-                # For Word docs, you'd need python-docx
                 text = f"[{file_ext} files not yet supported for text extraction]"
 
-            if not text:
-                raise HTTPException(status_code=400, detail="Could not extract text from file")
+            validate_text_content(text)
 
             # 4. Parse with AI
             parsed_data = parse_cv_with_ai(text)
 
-            # 5. Save to database
+            # 5. Save to database WITH user_id
             cv_record = {
+                "user_id": current_user["id"],
+                "user_role": current_user.get("role", "user"),
                 "filename": file.filename,
-                "raw_text": text[:5000],  # Limit stored text
+                "raw_text": text[:5000],
                 "parsed_data": parsed_data,
                 "status": "analyzed"
             }
@@ -72,21 +57,22 @@ async def analyze_cv(file: UploadFile = File(...)):
             try:
                 cv_id = await save_cv(cv_record)
                 parsed_data["cv_id"] = cv_id
+                
+                # Add skill gap analysis
+                skills = parsed_data.get("skills", [])
+                score = parsed_data.get("analysis", {}).get("overall_score", 0)
+                exp_years = parsed_data.get("experience_years", 0)
+                parsed_data["skill_gap"] = analyze_skill_gap(skills, score, exp_years)
             except Exception as e:
                 print(f"⚠️ Database save failed (continuing): {e}")
                 parsed_data["cv_id"] = None
 
-            return JSONResponse(
-                status_code=200,
-                content={
-                    "success": True,
-                    "message": "CV analyzed successfully",
-                    "data": parsed_data
-                }
+            return success_response(
+                message="CV analyzed successfully",
+                data=parsed_data
             )
 
         finally:
-            # Cleanup temp file
             if os.path.exists(tmp_path):
                 os.unlink(tmp_path)
 
@@ -97,23 +83,23 @@ async def analyze_cv(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/list")
-async def list_cvs():
-    """List all analyzed CVs."""
-    from config.database import get_all_cvs
+async def list_cvs(current_user: dict = Depends(require_role("user", "recruiter"))):
+    """List only the authenticated user's analyzed CVs."""
+    from config.database import get_user_cvs
     try:
-        cvs = await get_all_cvs()
+        cvs = await get_user_cvs(current_user["id"])
         return {"success": True, "cvs": cvs}
     except Exception as e:
         print(f"⚠️ Database error: {e}")
         return {"success": True, "cvs": [], "warning": "Database not connected"}
 
 @router.get("/{cv_id}")
-async def get_cv(cv_id: str):
-    """Get a specific CV by ID."""
+async def get_cv(cv_id: str, current_user: dict = Depends(require_role("user", "recruiter"))):
+    """Get a specific CV by ID. Only if it belongs to the authenticated user."""
     from config.database import get_cv_by_id
     try:
         cv = await get_cv_by_id(cv_id)
-        if not cv:
+        if not cv or cv.get("user_id") != current_user["id"]:
             raise HTTPException(status_code=404, detail="CV not found")
         return {"success": True, "cv": cv}
     except HTTPException:
@@ -123,10 +109,13 @@ async def get_cv(cv_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.delete("/{cv_id}")
-async def delete_cv(cv_id: str):
-    """Delete a CV by ID."""
-    from config.database import delete_cv_by_id
+async def delete_cv(cv_id: str, current_user: dict = Depends(require_role("user", "recruiter"))):
+    """Delete a CV by ID. Only if it belongs to the authenticated user."""
+    from config.database import delete_cv_by_id, get_cv_by_id
     try:
+        cv = await get_cv_by_id(cv_id)
+        if not cv or cv.get("user_id") != current_user["id"]:
+            raise HTTPException(status_code=404, detail="CV not found")
         deleted = await delete_cv_by_id(cv_id)
         if not deleted:
             raise HTTPException(status_code=404, detail="CV not found")
@@ -135,4 +124,27 @@ async def delete_cv(cv_id: str):
         raise
     except Exception as e:
         print(f"❌ Error deleting CV: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/{cv_id}/skill-gap")
+async def get_cv_skill_gap(cv_id: str, current_user: dict = Depends(require_role("user", "recruiter"))):
+    """Get skill gap analysis for a specific CV."""
+    from config.database import get_cv_by_id
+    try:
+        cv = await get_cv_by_id(cv_id)
+        if not cv or cv.get("user_id") != current_user["id"]:
+            raise HTTPException(status_code=404, detail="CV not found")
+        
+        parsed = cv.get("parsed_data", {})
+        skills = parsed.get("skills", [])
+        score = parsed.get("analysis", {}).get("overall_score", 0)
+        exp_years = parsed.get("experience_years", 0)
+        
+        gap_analysis = analyze_skill_gap(skills, score, exp_years)
+        return {"success": True, "skill_gap": gap_analysis}
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error analyzing skill gap: {e}")
         raise HTTPException(status_code=500, detail=str(e))

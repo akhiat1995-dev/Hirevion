@@ -2,42 +2,36 @@ import os
 import tempfile
 from pathlib import Path
 from typing import List
-from fastapi import APIRouter, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Depends
 from fastapi.responses import JSONResponse
 from services.agent import run_hiring_pipeline, extract_job_profile, parse_cv_with_ai
 from config.database import (
     save_recruiter_application,
     get_all_recruiter_applications,
+    get_user_recruiter_applications,
     get_recruiter_application_by_id,
     delete_recruiter_application,
     clear_all_recruiter_applications,
     save_job,
     get_all_jobs,
+    get_user_jobs,
     get_job_by_id,
     update_job,
     delete_job,
     save_hiring_session,
     get_all_hiring_sessions,
+    get_user_hiring_sessions,
     get_hiring_session_by_id,
     delete_hiring_session,
     clear_all_hiring_sessions
 )
+from config.settings import settings
 from services.extractor import read_pdf
-
-ALLOWED_EXTENSIONS = {'.pdf', '.doc', '.docx'}
-MAX_FILE_SIZE = 10 * 1024 * 1024
+from utils.validators import validate_file_extension, validate_file_size, validate_text_content
+from utils.response import success_response, error_response
+from middleware.auth import get_current_user, require_role
 
 router = APIRouter(prefix="/recruiter", tags=["Recruiter"])
-
-def validate_file(file: UploadFile):
-    """Validate uploaded file."""
-    file_ext = Path(file.filename).suffix.lower()
-    if file_ext not in ALLOWED_EXTENSIONS:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid file type. Allowed: {', '.join(ALLOWED_EXTENSIONS)}"
-        )
-    return file_ext
 
 # ============ MAIN ENDPOINT - COMPLETE RECRUITER WORKFLOW ============
 
@@ -46,7 +40,8 @@ async def recruiter_hiring_workflow(
     job_title: str = Form(..., description="Job title"),
     number_of_positions: int = Form(..., ge=1, le=100, description="Number of open positions"),
     job_requirements: str = Form(..., description="Job requirements and description"),
-    cvs: List[UploadFile] = File(..., description="Upload multiple CV files (PDF)")
+    cvs: List[UploadFile] = File(..., description="Upload multiple CV files (PDF)"),
+    current_user: dict = Depends(require_role("recruiter"))
 ):
     """
     ╔═══════════════════════════════════════════════════════════════════════════╗
@@ -104,13 +99,9 @@ async def recruiter_hiring_workflow(
 
     for file in cvs:
         try:
-            file_ext = validate_file(file)
+            file_ext = validate_file_extension(file, settings.allowed_extensions_set)
             content = await file.read()
-
-            if len(content) > MAX_FILE_SIZE:
-                print(f"⚠️ {file.filename}: File too large")
-                failed += 1
-                continue
+            validate_file_size(content, settings.MAX_FILE_SIZE)
 
             with tempfile.NamedTemporaryFile(delete=False, suffix=file_ext) as tmp:
                 tmp.write(content)
@@ -122,8 +113,10 @@ async def recruiter_hiring_workflow(
                 else:
                     text = f"[{file_ext} files not yet supported]"
 
-                if not text:
-                    print(f"⚠️ {file.filename}: Could not extract text")
+                try:
+                    validate_text_content(text)
+                except HTTPException:
+                    print(f"⚠️ {file.filename}: Could not extract sufficient text")
                     failed += 1
                     continue
 
@@ -131,6 +124,8 @@ async def recruiter_hiring_workflow(
                 candidate_name = parsed_data.get("candidate_info", {}).get("name", "Unknown")
 
                 cv_record = {
+                    "user_id": current_user["id"],
+                    "user_role": current_user.get("role", "recruiter"),
                     "filename": file.filename,
                     "raw_text": text[:5000],
                     "parsed_data": parsed_data,
@@ -191,6 +186,8 @@ async def recruiter_hiring_workflow(
     result["message"] = f"Hiring workflow completed! {successful} CVs analyzed, {result['selection_summary']['approved_count']} approved for interview."
 
     session_data = {
+        "user_id": current_user["id"],
+        "user_role": current_user.get("role", "recruiter"),
         "job_title": job_title,
         "number_of_positions": number_of_positions,
         "job_requirements": job_requirements,
@@ -221,10 +218,10 @@ async def recruiter_hiring_workflow(
 # ============ APPLICATION MANAGEMENT ============
 
 @router.get("/applications")
-async def list_recruiter_applications():
-    """List all uploaded CVs from previous recruiter sessions."""
+async def list_recruiter_applications(current_user: dict = Depends(require_role("recruiter"))):
+    """List only the authenticated user's uploaded CVs from recruiter sessions."""
     try:
-        applications = await get_all_recruiter_applications()
+        applications = await get_user_recruiter_applications(current_user["id"])
         return {
             "success": True,
             "count": len(applications),
@@ -251,8 +248,8 @@ async def list_recruiter_applications():
         }
 
 @router.delete("/applications")
-async def clear_all_applications():
-    """Clear all recruiter applications (start fresh)."""
+async def clear_all_applications(current_user: dict = Depends(get_current_user)):
+    """Clear all recruiter applications (start fresh). Requires authentication."""
     try:
         count = await clear_all_recruiter_applications()
         return {
@@ -267,10 +264,10 @@ async def clear_all_applications():
 # ============ JOB MANAGEMENT ============
 
 @router.get("/jobs")
-async def list_jobs():
-    """List all saved job postings."""
+async def list_jobs(current_user: dict = Depends(require_role("recruiter"))):
+    """List only the authenticated user's saved job postings."""
     try:
-        jobs = await get_all_jobs()
+        jobs = await get_user_jobs(current_user["id"])
         return {
             "success": True,
             "jobs": jobs,
@@ -300,8 +297,8 @@ async def get_job(job_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.put("/jobs/{job_id}")
-async def update_job_posting(job_id: str, job_data: dict):
-    """Update a job posting."""
+async def update_job_posting(job_id: str, job_data: dict, current_user: dict = Depends(get_current_user)):
+    """Update a job posting. Requires authentication."""
     try:
         existing = await get_job_by_id(job_id)
         if not existing:
@@ -327,8 +324,8 @@ async def update_job_posting(job_id: str, job_data: dict):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.delete("/jobs/{job_id}")
-async def delete_job_posting(job_id: str):
-    """Delete a job posting."""
+async def delete_job_posting(job_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a job posting. Requires authentication."""
     try:
         deleted = await delete_job(job_id)
         if not deleted:
@@ -347,10 +344,10 @@ async def delete_job_posting(job_id: str):
 # ============ HIRING SESSIONS (Complete Workflow History) ============
 
 @router.get("/sessions")
-async def list_hiring_sessions():
-    """List all hiring sessions with complete results."""
+async def list_hiring_sessions(current_user: dict = Depends(require_role("recruiter"))):
+    """List only the authenticated user's hiring sessions with complete results."""
     try:
-        sessions = await get_all_hiring_sessions()
+        sessions = await get_user_hiring_sessions(current_user["id"])
         return {
             "success": True,
             "count": len(sessions),
@@ -391,8 +388,8 @@ async def get_hiring_session(session_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.delete("/sessions/{session_id}")
-async def delete_hiring_session_endpoint(session_id: str):
-    """Delete a hiring session."""
+async def delete_hiring_session_endpoint(session_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a hiring session. Requires authentication."""
     try:
         deleted = await delete_hiring_session(session_id)
         if not deleted:
@@ -409,8 +406,8 @@ async def delete_hiring_session_endpoint(session_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.delete("/sessions")
-async def clear_all_sessions():
-    """Clear all hiring sessions."""
+async def clear_all_sessions(current_user: dict = Depends(get_current_user)):
+    """Clear all hiring sessions. Requires authentication."""
     try:
         count = await clear_all_hiring_sessions()
         return {
@@ -421,3 +418,27 @@ async def clear_all_sessions():
     except Exception as e:
         print(f"❌ Error clearing sessions: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.put("/sessions/{session_id}/notes")
+async def update_session_notes(
+    session_id: str,
+    notes_data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Add or update notes on a hiring session or specific candidate."""
+    from config.database import get_hiring_session_by_id, update_hiring_session_notes
+    from bson.objectid import ObjectId
+
+    session = await get_hiring_session_by_id(session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    if session.get("user_id") != current_user["id"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    try:
+        await update_hiring_session_notes(session_id, notes_data)
+        return {"success": True, "message": "Notes saved"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save notes: {str(e)}")
