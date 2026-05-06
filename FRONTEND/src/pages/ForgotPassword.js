@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Mail, CheckCircle2, AlertCircle } from 'lucide-react';
 import api from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 import { Button, Input, Alert } from '../components/ui';
 
 export default function ForgotPassword() {
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -35,8 +37,8 @@ export default function ForgotPassword() {
     <div className="min-h-[calc(100vh-200px)] flex items-center justify-center py-12 px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <h1 className="font-serif text-3xl font-bold text-navy-900 mb-2">Forgot Password?</h1>
-          <p className="text-gray-600">Enter your email and we'll send you a reset link.</p>
+          <h1 className="font-serif text-3xl font-bold text-navy-900 mb-2">{t('forgotPasswordTitle')}</h1>
+          <p className="text-gray-600">{t('forgotPasswordDesc')}</p>
         </div>
 
         <div className="bg-white rounded-lg border border-warm-200 shadow-sm p-8">
@@ -45,7 +47,7 @@ export default function ForgotPassword() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <Input
-              label="Email Address"
+              label={t('email')}
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -55,7 +57,7 @@ export default function ForgotPassword() {
             />
 
             <Button type="submit" variant="primary" size="lg" loading={loading} className="w-full">
-              <Mail size={18} className="mr-2" /> Send Reset Link
+              <Mail size={18} className="mr-2" /> {t('resetPassword')}
             </Button>
           </form>
 
@@ -68,7 +70,7 @@ export default function ForgotPassword() {
 
           <div className="mt-6 text-center">
             <Link to="/login" className="text-navy-900 font-medium hover:underline inline-flex items-center gap-1">
-              <ArrowLeft size={16} /> Back to Sign In
+              <ArrowLeft size={16} /> {t('backToLogin')}
             </Link>
           </div>
         </div>

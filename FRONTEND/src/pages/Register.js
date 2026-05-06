@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Upload, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { Button, Input, Alert } from '../components/ui';
 
 export default function Register() {
   const { register, loading, error, clearError } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
@@ -67,7 +69,7 @@ export default function Register() {
     <div className="min-h-[calc(100vh-200px)] flex items-center justify-center py-12 px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <h1 className="font-serif text-3xl font-bold text-navy-900 mb-2">Create Account</h1>
+          <h1 className="font-serif text-3xl font-bold text-navy-900 mb-2">{t('createAccount')}</h1>
           <p className="text-gray-600">Choose your role and get started</p>
         </div>
 
@@ -115,7 +117,7 @@ export default function Register() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <Input
-              label="Full Name"
+              label={t('fullName')}
               type="text"
               name="full_name"
               value={formData.full_name}
@@ -126,7 +128,7 @@ export default function Register() {
             />
 
             <Input
-              label="Email"
+              label={t('email')}
               type="email"
               name="email"
               value={formData.email}
@@ -137,7 +139,7 @@ export default function Register() {
             />
 
             <Input
-              label="Password"
+              label={t('password')}
               type="password"
               name="password"
               value={formData.password}
@@ -148,7 +150,7 @@ export default function Register() {
             />
 
             <Input
-              label="Confirm Password"
+              label={t('confirmPassword')}
               type="password"
               name="confirm_password"
               value={formData.confirm_password}
@@ -165,15 +167,15 @@ export default function Register() {
               loading={loading}
               className="w-full"
             >
-              Create {formData.role === 'recruiter' ? 'Recruiter' : 'Candidate'} Account
+              {t('createAccount')} {formData.role === 'recruiter' ? 'Recruiter' : 'Candidate'}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-gray-600">
-              Already have an account?{' '}
+              {t('haveAccount')}{' '}
               <Link to="/login" className="text-navy-900 font-medium hover:underline">
-                Sign in
+                {t('signIn')}
               </Link>
             </p>
           </div>

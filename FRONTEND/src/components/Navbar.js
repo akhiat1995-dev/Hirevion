@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Rocket, Upload, Users, Pencil, ChevronRight, LogOut, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
+import LanguageSwitch from './LanguageSwitch';
 
 const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
+  const { t } = useLanguage();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showRoleModal, setShowRoleModal] = useState(false);
@@ -46,8 +49,8 @@ const Navbar = () => {
             </button>
             
             <div className="text-center mb-6">
-              <h2 className="font-serif text-2xl font-bold text-navy-900 mb-2">Choose Your Role</h2>
-              <p className="text-gray-600 text-sm">Select how you want to use Hirevion</p>
+              <h2 className="font-serif text-2xl font-bold text-navy-900 mb-2">{t('chooseYourRole')}</h2>
+              <p className="text-gray-600 text-sm">{t('selectHowYouUseHirevion')}</p>
             </div>
             
             <div className="space-y-4">
@@ -61,7 +64,7 @@ const Navbar = () => {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-bold text-navy-900">Recruiter</h3>
-                  <p className="text-sm text-gray-500">I'm hiring and want to find candidates</p>
+                  <p className="text-sm text-gray-500">{t('imHiring')}</p>
                 </div>
                 <ChevronRight size={20} className="text-gray-400 group-hover:text-navy-800 transition-colors" />
               </Link>
@@ -76,7 +79,7 @@ const Navbar = () => {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-bold text-navy-900">Candidate</h3>
-                  <p className="text-sm text-gray-500">I want to analyze and improve my CV</p>
+                  <p className="text-sm text-gray-500">{t('iWantToAnalyze')}</p>
                 </div>
                 <ChevronRight size={20} className="text-gray-400 group-hover:text-navy-800 transition-colors" />
               </Link>
@@ -119,7 +122,7 @@ const Navbar = () => {
                 isActive('/') ? 'text-navy-800 font-bold border-b-2 border-navy-800' : 'text-gray-600 hover:text-navy-800'
               }`}
             >
-              Home
+              {t('home')}
             </Link>
             {isAuthenticated ? (
               user?.role === 'recruiter' ? (
@@ -129,7 +132,7 @@ const Navbar = () => {
                     isActive('/recruiter') ? 'text-navy-800 font-bold border-b-2 border-navy-800' : 'text-gray-600 hover:text-navy-800'
                   }`}
                 >
-                  Dashboard
+                  {t('dashboard')}
                 </Link>
               ) : (
                 <Link 
@@ -138,26 +141,26 @@ const Navbar = () => {
                     isActive('/candidate') ? 'text-navy-800 font-bold border-b-2 border-navy-800' : 'text-gray-600 hover:text-navy-800'
                   }`}
                 >
-                  My CVs
+                  {t('myCVs')}
                 </Link>
               )
             ) : (
               <>
                 <Link 
-                  to="/candidate" 
+                  to="/candidate-landing" 
                   className={`text-sm uppercase tracking-wider font-medium transition-colors ${
-                    isActive('/candidate') ? 'text-navy-800 font-bold border-b-2 border-navy-800' : 'text-gray-600 hover:text-navy-800'
+                    isActive('/candidate-landing') ? 'text-navy-800 font-bold border-b-2 border-navy-800' : 'text-gray-600 hover:text-navy-800'
                   }`}
                 >
-                  For Candidates
+                  {t('forCandidates')}
                 </Link>
                 <Link 
-                  to="/recruiter" 
+                  to="/recruiter-landing" 
                   className={`text-sm uppercase tracking-wider font-medium transition-colors ${
-                    isActive('/recruiter') ? 'text-navy-800 font-bold border-b-2 border-navy-800' : 'text-gray-600 hover:text-navy-800'
+                    isActive('/recruiter-landing') ? 'text-navy-800 font-bold border-b-2 border-navy-800' : 'text-gray-600 hover:text-navy-800'
                   }`}
                 >
-                  For Recruiters
+                  {t('forRecruiters')}
                 </Link>
               </>
             )}
@@ -192,7 +195,7 @@ const Navbar = () => {
                         onClick={() => setShowUserMenu(false)}
                         className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-navy-50"
                       >
-                        <Users size={14} /> Dashboard
+                        <Users size={14} /> {t('dashboard')}
                       </Link>
                     ) : (
                       <Link
@@ -200,7 +203,7 @@ const Navbar = () => {
                         onClick={() => setShowUserMenu(false)}
                         className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-navy-50"
                       >
-                        <Upload size={14} /> My CVs
+                        <Upload size={14} /> {t('myCVs')}
                       </Link>
                     )}
                     <Link
@@ -208,32 +211,33 @@ const Navbar = () => {
                       onClick={() => setShowUserMenu(false)}
                       className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-navy-50"
                     >
-                      <User size={14} /> Settings
+                      <User size={14} /> {t('settings')}
                     </Link>
                     <hr className="my-1 border-warm-100" />
                     <button
                       onClick={handleLogout}
                       className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                     >
-                      <LogOut size={14} /> Sign Out
+                      <LogOut size={14} /> {t('signOut')}
                     </button>
                   </div>
                 )}
               </div>
             ) : (
               <>
+                <LanguageSwitch />
                 <Link
                   to="/login"
                   className="text-navy-800 font-medium text-sm hover:text-navy-900 transition-colors"
                 >
-                  Sign In
+                  {t('signIn')}
                 </Link>
                 <Link
                   to="/register"
                   className="bg-navy-800 text-white px-5 py-2.5 rounded-sm hover:bg-navy-900 transition-all shadow-sm hover:shadow-md font-medium text-sm flex items-center gap-2"
                 >
                   <Rocket size={16} />
-                  Get Started
+                  {t('getStarted')}
                 </Link>
               </>
             )}
@@ -306,7 +310,7 @@ const Navbar = () => {
               ) : (
                 <>
                   <Link 
-                    to="/candidate" 
+                    to="/candidate-landing" 
                     className="text-gray-600 hover:text-navy-800 font-medium flex items-center gap-2"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
@@ -314,7 +318,7 @@ const Navbar = () => {
                     For Candidates
                   </Link>
                   <Link 
-                    to="/recruiter" 
+                    to="/recruiter-landing" 
                     className="text-gray-600 hover:text-navy-800 font-medium flex items-center gap-2"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >

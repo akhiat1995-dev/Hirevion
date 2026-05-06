@@ -3,6 +3,7 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AuthProvider } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
+import { LanguageProvider } from './context/LanguageContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -23,6 +24,8 @@ import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import ProfileSettings from './pages/ProfileSettings';
+import RecruiterLanding from './pages/RecruiterLanding';
+import CandidateLanding from './pages/CandidateLanding';
 import NotFound from './pages/NotFound';
 import './components/PageTransition.css';
 
@@ -49,16 +52,20 @@ const AnimatedRoute = ({ children }) => (
 
 const AnimatedRoutes = () => {
   const location = useLocation();
+  const isHome = location.pathname === '/';
   
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<AnimatedRoute><Home /></AnimatedRoute>} />
+        <Route path="/recruiter-landing" element={<AnimatedRoute><RecruiterLanding /></AnimatedRoute>} />
+        <Route path="/candidate-landing" element={<AnimatedRoute><CandidateLanding /></AnimatedRoute>} />
         <Route path="/test" element={<AnimatedRoute><TestBackend /></AnimatedRoute>} />
         <Route path="/designs" element={<AnimatedRoute><DesignShowcase /></AnimatedRoute>} />
         <Route path="/scroll-demo" element={<AnimatedRoute><ScrollAnimationsDemo /></AnimatedRoute>} />
         
         <Route path="/login" element={<AnimatedRoute><ProtectedRoute requireAuth={false}><Login /></ProtectedRoute></AnimatedRoute>} />
+        <Route path="/signin" element={<AnimatedRoute><ProtectedRoute requireAuth={false}><Login /></ProtectedRoute></AnimatedRoute>} />
         <Route path="/register" element={<AnimatedRoute><ProtectedRoute requireAuth={false}><Register /></ProtectedRoute></AnimatedRoute>} />
         <Route path="/forgot-password" element={<AnimatedRoute><ProtectedRoute requireAuth={false}><ForgotPassword /></ProtectedRoute></AnimatedRoute>} />
         <Route path="/reset-password" element={<AnimatedRoute><ProtectedRoute requireAuth={false}><ResetPassword /></ProtectedRoute></AnimatedRoute>} />
@@ -78,20 +85,26 @@ const AnimatedRoutes = () => {
 };
 
 function App() {
+  const location = useLocation();
+  const isHome = location.pathname === '/';
+  const isLandingPage = location.pathname === '/recruiter-landing' || location.pathname === '/candidate-landing';
+  
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <NotificationProvider>
-          <div className="min-h-screen bg-warm-white flex flex-col">
-            <CustomCursor />
-            <Navbar />
-            <main className="flex-grow relative overflow-x-hidden">
-              <AnimatedRoutes />
-            </main>
-            <Footer />
-          </div>
-        </NotificationProvider>
-      </AuthProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <NotificationProvider>
+            <div className={`min-h-screen flex flex-col ${isHome ? 'bg-transparent' : 'bg-warm-white'}`}>
+              <CustomCursor />
+              {isLandingPage && <Navbar />}
+              <main className={`flex-grow relative overflow-x-hidden ${isHome ? 'flex items-center justify-center' : ''}`}>
+                <AnimatedRoutes />
+              </main>
+              {isLandingPage && <Footer />}
+            </div>
+          </NotificationProvider>
+        </AuthProvider>
+      </LanguageProvider>
     </ErrorBoundary>
   );
 }

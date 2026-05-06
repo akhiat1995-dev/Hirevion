@@ -1,14 +1,20 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Upload, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { Button, Input, Alert } from '../components/ui';
 
 export default function Login() {
   const { login, loading, error, clearError } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
-  const [loginRole, setLoginRole] = useState('user');
+  const urlRole = searchParams.get('role');
+  const defaultRole = urlRole === 'recruiter' ? 'recruiter' : 'candidate';
+  
+  const [loginRole, setLoginRole] = useState(defaultRole);
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -54,8 +60,8 @@ export default function Login() {
     <div className="min-h-[calc(100vh-200px)] flex items-center justify-center py-12 px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <h1 className="font-serif text-3xl font-bold text-navy-900 mb-2">Welcome Back</h1>
-          <p className="text-gray-600">Sign in to continue</p>
+          <h1 className="font-serif text-3xl font-bold text-navy-900 mb-2">{t('login')}</h1>
+          <p className="text-gray-600">{t('signIn')}</p>
         </div>
 
         <div className="bg-white rounded-lg border border-warm-200 shadow-sm p-8">
@@ -65,9 +71,9 @@ export default function Login() {
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
-                onClick={() => setLoginRole('user')}
+                onClick={() => setLoginRole('candidate')}
                 className={`flex items-center justify-center gap-2 p-3 rounded-lg border-2 text-center transition-all ${
-                  loginRole === 'user'
+                  loginRole === 'candidate'
                     ? 'border-navy-900 bg-navy-50 text-navy-900'
                     : 'border-gray-200 text-gray-500 hover:border-gray-300'
                 }`}
@@ -96,7 +102,7 @@ export default function Login() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <Input
-              label="Email"
+              label={t('email')}
               type="email"
               name="email"
               value={formData.email}
@@ -107,7 +113,7 @@ export default function Login() {
             />
 
             <Input
-              label="Password"
+              label={t('password')}
               type="password"
               name="password"
               value={formData.password}
@@ -124,20 +130,20 @@ export default function Login() {
               loading={loading}
               className="w-full"
             >
-              Sign in as {loginRole === 'recruiter' ? 'Recruiter' : 'Candidate'}
+              {t('signIn')} {loginRole === 'recruiter' ? 'Recruiter' : 'Candidate'}
             </Button>
           </form>
 
           <div className="mt-6 text-center space-y-2">
             <p className="text-gray-600">
-              Don't have an account?{' '}
+              {t('noAccount')}{' '}
               <Link to="/register" className="text-navy-900 font-medium hover:underline">
-                Create one
+                {t('createAccount')}
               </Link>
             </p>
             <p>
               <Link to="/forgot-password" className="text-sm text-navy-800 hover:underline font-medium">
-                Forgot your password?
+                {t('forgotPassword')}
               </Link>
             </p>
           </div>
