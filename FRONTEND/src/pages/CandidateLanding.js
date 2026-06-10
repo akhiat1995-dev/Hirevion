@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Rocket, Upload, FileText, TrendingUp, CheckCircle, ChevronRight, Pencil, Sparkles, Star } from 'lucide-react';
+import { Rocket, Upload, FileText, TrendingUp, CheckCircle, ChevronRight, Pencil, Sparkles, Star, Eye } from 'lucide-react';
 import { PencilUnderline, HandDrawnBox } from '../components/PencilDesigns';
 import { FadeInUp, StaggerContainer, StaggerItem } from '../components/ScrollAnimations';
 import { useLanguage } from '../context/LanguageContext';
@@ -59,10 +59,10 @@ const CandidateLanding = () => {
                   </Link>
                   
                   <Link 
-                    to="/signin?role=candidate"
+                    to="/candidate-demo"
                     className="inline-flex items-center justify-center gap-2 bg-white text-navy-800 border-2 border-warm-200 px-8 py-4 rounded-sm hover:border-orange-500 transition-all font-medium"
                   >
-                    <FileText size={20} />
+                    <Eye size={20} />
                     {t('viewDemo')}
                   </Link>
                 </div>

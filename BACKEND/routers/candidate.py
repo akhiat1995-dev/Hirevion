@@ -14,6 +14,53 @@ from middleware.auth import get_current_user, require_role
 
 router = APIRouter(prefix="/candidate", tags=["Candidate"])
 
+@router.post("/try-free")
+async def try_free_analyze(file: UploadFile = File(...)):
+    """
+    Try CV analysis for FREE - no authentication required.
+    Limited to PDF files only. Results are not saved.
+    """
+    print(f"📥 Try-Free upload received: {file.filename}")
+
+    try:
+        file_ext = validate_file_extension(file, settings.allowed_extensions_set)
+        content = await file.read()
+        validate_file_size(content, settings.MAX_FILE_SIZE)
+
+        with tempfile.NamedTemporaryFile(delete=False, suffix=file_ext) as tmp:
+            tmp.write(content)
+            tmp_path = tmp.name
+
+        try:
+            if file_ext == '.pdf':
+                text = read_pdf(tmp_path)
+            else:
+                text = f"[{file_ext} files not yet supported for text extraction]"
+
+            validate_text_content(text)
+
+            parsed_data = parse_cv_with_ai(text)
+
+            skills = parsed_data.get("skills", [])
+            score = parsed_data.get("analysis", {}).get("overall_score", 0)
+            exp_years = parsed_data.get("experience_years", 0)
+            parsed_data["skill_gap"] = analyze_skill_gap(skills, score, exp_years)
+
+            return success_response(
+                message="CV analyzed successfully (Try Free)",
+                data=parsed_data
+            )
+
+        finally:
+            if os.path.exists(tmp_path):
+                os.unlink(tmp_path)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error processing CV in Try-Free: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.post("/analyze")
 async def analyze_cv(file: UploadFile = File(...), current_user: dict = Depends(require_role("user", "recruiter"))):
     """

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Rocket, Upload, Users, Pencil, ChevronRight, LogOut, User } from 'lucide-react';
+import { Menu, X, Rocket, Upload, Users, Pencil, ChevronRight, LogOut, User, Zap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import LanguageSwitch from './LanguageSwitch';
@@ -14,6 +14,7 @@ const Navbar = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const isTryFree = location.pathname === '/try-free';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -124,7 +125,7 @@ const Navbar = () => {
             >
               {t('home')}
             </Link>
-            {isAuthenticated ? (
+            {!isTryFree && isAuthenticated ? (
               user?.role === 'recruiter' ? (
                 <Link 
                   to="/recruiter" 
@@ -168,7 +169,7 @@ const Navbar = () => {
 
           {/* CTA Button */}
           <div className="hidden md:flex items-center space-x-4">
-            {isAuthenticated ? (
+            {!isTryFree && isAuthenticated ? (
               <div className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
@@ -227,6 +228,13 @@ const Navbar = () => {
               <>
                 <LanguageSwitch />
                 <Link
+                  to="/try-free"
+                  className="text-orange-600 font-medium text-sm hover:text-orange-700 transition-colors flex items-center gap-1"
+                >
+                  <Zap size={16} />
+                  Try Free
+                </Link>
+                <Link
                   to="/login"
                   className="text-navy-800 font-medium text-sm hover:text-navy-900 transition-colors"
                 >
@@ -264,7 +272,7 @@ const Navbar = () => {
                 Home
               </Link>
 
-              {isAuthenticated ? (
+              {!isTryFree && isAuthenticated ? (
                 <>
                   <div className="flex items-center gap-3 px-2 py-3 bg-navy-50 rounded-lg">
                     <div className="w-9 h-9 rounded-full bg-navy-800 text-white flex items-center justify-center text-sm font-bold">
@@ -309,6 +317,14 @@ const Navbar = () => {
                 </>
               ) : (
                 <>
+                  <Link 
+                    to="/try-free" 
+                    className="text-orange-600 font-medium flex items-center gap-2"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Zap size={16} />
+                    Try Free
+                  </Link>
                   <Link 
                     to="/candidate-landing" 
                     className="text-gray-600 hover:text-navy-800 font-medium flex items-center gap-2"

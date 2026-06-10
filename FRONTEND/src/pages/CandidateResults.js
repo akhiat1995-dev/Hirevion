@@ -4,7 +4,7 @@ import {
   CheckCircle, AlertCircle, ArrowLeft, Download, RefreshCw,
   TrendingUp, Award, Star, AlertTriangle, Brain, FileText, ChevronRight, 
   Zap, Lightbulb, User, Mail, Phone, MapPin, Linkedin, Calendar, Briefcase, GraduationCap, Target, ArrowUpRight,
-  BarChart3, Clock, BookOpen, Languages, Code, Building, Globe
+  BarChart3, Clock, BookOpen, Languages, Code, Building, Globe, Loader2
 } from 'lucide-react';
 import { PencilLoading, PencilProgressBar } from '../components/PencilDesigns';
 import '../components/PencilDesigns.css';
@@ -14,6 +14,7 @@ const CandidateResults = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     if (location.state?.result) { setResult(location.state.result); setLoading(false); }
@@ -111,6 +112,26 @@ const CandidateResults = () => {
     { label: 'Projects', score: sectionRatings?.projects?.score || 0, comment: sectionRatings?.projects?.comment || '', icon: Code },
   ];
 
+  const exportPDF = async () => {
+    setExporting(true);
+    try {
+      const html2pdf = (await import('html2pdf.js')).default;
+      const element = document.getElementById('candidate-report');
+      const opt = {
+        margin:       0.5,
+        filename:     `Hirevion-CV-Report-${candidateInfo.name || 'candidate'}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+      };
+      await html2pdf().set(opt).from(element).save();
+    } catch (err) {
+      console.error('PDF export failed:', err);
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <div className="pt-28 pb-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
       {/* Action Bar */}
@@ -121,10 +142,10 @@ const CandidateResults = () => {
           <span className="text-navy-800 font-medium">Analysis Results</span>
         </div>
         <div className="flex gap-3">
-          <button onClick={() => window.print()} className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-navy-800 to-navy-900 text-white rounded-xl hover:shadow-lg transition-all text-sm font-medium">
-            <Download size={16} /> Export PDF Report
+          <button onClick={exportPDF} disabled={exporting} className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-navy-800 to-navy-900 text-white rounded-xl hover:shadow-lg transition-all text-sm font-medium disabled:opacity-50">
+            {exporting ? <><Loader2 className="animate-spin" size={16} /> Generating...</> : <><Download size={16} /> Export PDF Report</>}
           </button>
-          <Link to="/candidate" className="flex items-center gap-2 px-4 py-2.5 bg-white border-2 border-warm-200 rounded-xl hover:border-navy-300 transition-all text-sm font-medium text-gray-700">
+          <Link to={location.state?.fromTryFree ? '/try-free' : '/candidate'} className="flex items-center gap-2 px-4 py-2.5 bg-white border-2 border-warm-200 rounded-xl hover:border-navy-300 transition-all text-sm font-medium text-gray-700">
             <RefreshCw size={16} /> New Analysis
           </Link>
         </div>

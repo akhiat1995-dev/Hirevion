@@ -1,26 +1,44 @@
 import sys
+import os
 from pathlib import Path
 
-# Add the BACKEND directory to Python path
 backend_dir = Path(__file__).parent.absolute()
 sys.path.insert(0, str(backend_dir))
 
+if sys.platform == 'win32':
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers import candidate, recruiter, auth
 from config.database import connect_db, close_db, get_statistics
 from config.settings import settings
 
-# Validate settings at startup
-settings.validate_all()
+def validate_settings():
+    try:
+        settings.validate_all()
+    except ValueError as e:
+        print(f"WARNING: {e}")
+        print("Server will continue but some features may not work properly.")
+
+validate_settings()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await connect_db()
+    yield
+    await close_db()
 
 app = FastAPI(
     title=settings.APP_NAME,
     description=settings.APP_DESCRIPTION,
-    version=settings.APP_VERSION
+    version=settings.APP_VERSION,
+    lifespan=lifespan
 )
 
-# CORS - Use centralized settings
 origins = settings.allowed_origins_list
 
 app.add_middleware(
@@ -30,16 +48,6 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
-
-@app.on_event("startup")
-async def startup_event():
-    """Connect to database on startup."""
-    await connect_db()
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Close database connection on shutdown."""
-    await close_db()
 
 app.include_router(auth.router)
 app.include_router(candidate.router)
@@ -56,7 +64,6 @@ def read_root():
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint to verify API and database status."""
     from datetime import datetime
     from config.database import database
 
@@ -71,25 +78,10 @@ async def health_check():
 
 @app.get("/stats")
 async def get_platform_stats():
-    """
-    Get platform statistics for dashboard.
-    
-    Returns:
-    - total_cvs: Total number of CVs analyzed
-    - total_jobs: Total number of job postings
-    - total_applications: Total recruiter applications
-    - average_score: Average CV score
-    - average_experience_years: Average years of experience
-    - top_skills: Top 10 most common skills
-    """
     try:
         stats = await get_statistics()
-        return {
-            "success": True,
-            "stats": stats
-        }
+        return {"success": True, "stats": stats}
     except Exception as e:
-        print(f"❌ Error getting statistics: {e}")
         return {
             "success": False,
             "error": str(e),
@@ -103,12 +95,25 @@ async def get_platform_stats():
             }
         }
 
-# Run server when executed directly
 if __name__ == "__main__":
     import uvicorn
-    print("🚀 Starting Hirevion Backend...")
-    print("🎯 Smart Hiring Platform")
-    print("📡 Server: http://localhost:8000")
-    print("📚 API Docs: http://localhost:8000/docs")
-    print("\nPress Ctrl+C to stop\n")
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    import socket
+
+    def find_free_port(start_port=8000, max_attempts=10):
+        for port in range(start_port, start_port + max_attempts):
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            try:
+                s.bind(('0.0.0.0', port))
+                s.close()
+                return port
+            except OSError:
+                s.close()
+                continue
+        return start_port
+
+    port = find_free_port()
+    print(f"Starting Hirevion Backend on port {port}...")
+    print(f"Server: http://localhost:{port}")
+    print(f"Docs: http://localhost:{port}/docs")
+    uvicorn.run(app, host="0.0.0.0", port=port)

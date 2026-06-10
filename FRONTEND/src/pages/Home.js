@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Rocket, Upload, Users, Pencil, Sparkles, X, ChevronRight } from 'lucide-react';
+import { Rocket, Upload, Users, Pencil, Sparkles, X, ChevronRight, Zap } from 'lucide-react';
 import { PencilUnderline, HandDrawnBox } from '../components/PencilDesigns';
 import { useLanguage } from '../context/LanguageContext';
 import '../components/PencilDesigns.css';
@@ -98,6 +98,18 @@ const Home = () => {
                 <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
+          </Link>
+        </div>
+
+        <div className="mt-10 flex justify-center">
+          <Link
+            to="/try-free"
+            className="group relative inline-flex items-center gap-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-8 py-4 rounded-full hover:from-orange-600 hover:to-orange-700 transition-all shadow-lg hover:shadow-xl font-bold text-lg"
+          >
+            <span className="absolute inset-0 rounded-full bg-white/20 animate-ping opacity-20 group-hover:opacity-30"></span>
+            <Zap size={24} className="group-hover:scale-110 transition-transform" />
+            <span>Try Free CV Analysis</span>
+            <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
       </div>

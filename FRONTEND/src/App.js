@@ -19,6 +19,7 @@ import JobSetup from './pages/JobSetup';
 import TestBackend from './pages/TestBackend';
 import DesignShowcase from './pages/DesignShowcase';
 import ScrollAnimationsDemo from './pages/ScrollAnimationsDemo';
+import TryFree from './pages/TryFree';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
@@ -26,6 +27,8 @@ import ResetPassword from './pages/ResetPassword';
 import ProfileSettings from './pages/ProfileSettings';
 import RecruiterLanding from './pages/RecruiterLanding';
 import CandidateLanding from './pages/CandidateLanding';
+import RecruiterDemo from './pages/RecruiterDemo';
+import CandidateDemo from './pages/CandidateDemo';
 import NotFound from './pages/NotFound';
 import './components/PageTransition.css';
 
@@ -59,10 +62,13 @@ const AnimatedRoutes = () => {
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<AnimatedRoute><Home /></AnimatedRoute>} />
         <Route path="/recruiter-landing" element={<AnimatedRoute><RecruiterLanding /></AnimatedRoute>} />
+        <Route path="/recruiter-demo" element={<AnimatedRoute><RecruiterDemo /></AnimatedRoute>} />
         <Route path="/candidate-landing" element={<AnimatedRoute><CandidateLanding /></AnimatedRoute>} />
+        <Route path="/candidate-demo" element={<AnimatedRoute><CandidateDemo /></AnimatedRoute>} />
         <Route path="/test" element={<AnimatedRoute><TestBackend /></AnimatedRoute>} />
         <Route path="/designs" element={<AnimatedRoute><DesignShowcase /></AnimatedRoute>} />
         <Route path="/scroll-demo" element={<AnimatedRoute><ScrollAnimationsDemo /></AnimatedRoute>} />
+        <Route path="/try-free" element={<AnimatedRoute><TryFree /></AnimatedRoute>} />
         
         <Route path="/login" element={<AnimatedRoute><ProtectedRoute requireAuth={false}><Login /></ProtectedRoute></AnimatedRoute>} />
         <Route path="/signin" element={<AnimatedRoute><ProtectedRoute requireAuth={false}><Login /></ProtectedRoute></AnimatedRoute>} />
@@ -73,7 +79,7 @@ const AnimatedRoutes = () => {
         <Route path="/recruiter" element={<AnimatedRoute><ProtectedRoute><RecruiterDashboard /></ProtectedRoute></AnimatedRoute>} />
         <Route path="/candidate" element={<AnimatedRoute><ProtectedRoute><CandidateUpload /></ProtectedRoute></AnimatedRoute>} />
         <Route path="/candidate/dashboard" element={<AnimatedRoute><ProtectedRoute><CandidateDashboard /></ProtectedRoute></AnimatedRoute>} />
-        <Route path="/candidate/results" element={<AnimatedRoute><ProtectedRoute><CandidateResults /></ProtectedRoute></AnimatedRoute>} />
+        <Route path="/candidate/results" element={<AnimatedRoute><CandidateResults /></AnimatedRoute>} />
         <Route path="/job-setup" element={<AnimatedRoute><ProtectedRoute><JobSetup /></ProtectedRoute></AnimatedRoute>} />
         <Route path="/results" element={<AnimatedRoute><ProtectedRoute><Results /></ProtectedRoute></AnimatedRoute>} />
         <Route path="/profile" element={<AnimatedRoute><ProtectedRoute><ProfileSettings /></ProtectedRoute></AnimatedRoute>} />
@@ -87,7 +93,7 @@ const AnimatedRoutes = () => {
 function App() {
   const location = useLocation();
   const isHome = location.pathname === '/';
-  const isLandingPage = location.pathname === '/recruiter-landing' || location.pathname === '/candidate-landing';
+  const isLandingPage = location.pathname === '/recruiter-landing' || location.pathname === '/candidate-landing' || location.pathname === '/try-free';
   
   return (
     <ErrorBoundary>
