@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
-import { Upload, FileText, X, Loader2, CheckCircle, AlertCircle, Brain, FileSearch, Sparkles } from 'lucide-react';
+import { Upload, FileText, X, Loader2, CheckCircle, AlertCircle, Brain, Sparkles } from 'lucide-react';
 import { tryFreeAnalyze } from '../services/api';
 
 const TryFree = () => {

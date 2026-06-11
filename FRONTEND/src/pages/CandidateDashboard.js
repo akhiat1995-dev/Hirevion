@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Upload, TrendingUp, Award, Calendar, Trash2, Eye, ChevronRight, BarChart3, AlertCircle } from 'lucide-react';
+import { FileText, Upload, TrendingUp, Award, Calendar, Trash2, Eye, BarChart3 } from 'lucide-react';
 import { getCVs, deleteCV } from '../services/api';
 import { PencilUnderline } from '../components/PencilDesigns';
 

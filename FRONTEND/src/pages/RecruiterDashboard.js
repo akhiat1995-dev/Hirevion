@@ -1,10 +1,10 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
-import { Upload, FileText, X, Users, Briefcase, AlertCircle, CheckCircle2, Trash2, TrendingUp, Award, Calendar, ChevronRight, Eye, Star, UserX, Download, Search, Plus, ChevronDown, ChevronUp, StickyNote as StickyNoteIcon, BarChart3, Clock, Target, CheckCircle, Zap, AlertTriangle, Info, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
-import { submitHiringWorkflow, getStats, getHiringSessions, getHiringSession, deleteHiringSession, clearHiringSessions, getApplications } from '../services/api';
+import { Upload, FileText, X, Users, Briefcase, AlertCircle, CheckCircle2, Trash2, TrendingUp, Award, Calendar, ChevronRight, Eye, UserX, Download, Search, Plus, StickyNote as StickyNoteIcon, BarChart3, CheckCircle, AlertTriangle, ArrowUpRight } from 'lucide-react';
+import { submitHiringWorkflow, getStats, getHiringSessions, getHiringSession, deleteHiringSession, clearHiringSessions } from '../services/api';
 import api from '../services/api';
-import { PencilLoading, PencilProgressBar, PencilUnderline, StickyNote } from '../components/PencilDesigns';
+import { PencilLoading, PencilProgressBar } from '../components/PencilDesigns';
 import '../components/PencilDesigns.css';
 import '../components/PrintStyles.css';
 
@@ -68,10 +68,8 @@ const CandidateCard = ({ candidate, rank, type = 'approved' }) => {
   const skills = candidate.skills_analysis || {};
   const exp = candidate.experience_analysis || {};
   const edu = candidate.education_analysis || {};
-  const seniority = candidate.seniority_analysis || {};
   const softSkills = candidate.soft_skills_analysis || {};
   const growth = candidate.growth_analysis || {};
-  const domain = candidate.domain_analysis || {};
   const isApproved = type === 'approved';
 
   return (
@@ -217,23 +215,20 @@ const RecruiterDashboard = () => {
   const [jobRequirements, setJobRequirements] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [stats, setStats] = useState(null);
   const [sessions, setSessions] = useState([]);
   const [loadingSessions, setLoadingSessions] = useState(false);
   const [activeTab, setActiveTab] = useState('history');
   const [selectedSession, setSelectedSession] = useState(null);
   const [loadingSession, setLoadingSession] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const printRef = useRef(null);
 
-  useEffect(() => { fetchStats(); fetchSessions(); }, []);
+  useEffect(() => { fetchSessions(); }, []);
 
-  const fetchStats = async () => { try { const r = await getStats(); if (r.success) setStats(r.stats); } catch (e) {} };
   const fetchSessions = async () => { setLoadingSessions(true); try { const r = await getHiringSessions(); if (r.success) setSessions(r.sessions || []); } catch (e) {} finally { setLoadingSessions(false); } };
 
   const handleViewSession = async (sessionId) => { setLoadingSession(true); try { const r = await getHiringSession(sessionId); if (r.success) setSelectedSession(r.session); } catch (e) {} finally { setLoadingSession(false); } };
-  const handleDeleteSession = async (sessionId) => { if (window.confirm('Delete this screening and all its data?')) { try { await deleteHiringSession(sessionId); fetchSessions(); fetchStats(); if (selectedSession?.id === sessionId) setSelectedSession(null); } catch (e) {} } };
-  const handleClearAll = async () => { if (window.confirm('Delete ALL screenings and data?')) { try { await clearHiringSessions(); setSessions([]); setSelectedSession(null); fetchStats(); } catch (e) {} } };
+  const handleDeleteSession = async (sessionId) => { if (window.confirm('Delete this screening and all its data?')) { try { await deleteHiringSession(sessionId); fetchSessions(); if (selectedSession?.id === sessionId) setSelectedSession(null); } catch (e) {} } };
+  const handleClearAll = async () => { if (window.confirm('Delete ALL screenings and data?')) { try { await clearHiringSessions(); setSessions([]); setSelectedSession(null); } catch (e) {} } };
 
   const handleExportPDF = async (sessionData) => {
     const printEl = document.getElementById('session-detail-print');
@@ -568,7 +563,6 @@ const SessionDetailView = ({ session, onBack, onDelete, onExportPDF, formatDate 
               const softSkills = c.soft_skills_analysis || {};
               const growth = c.growth_analysis || {};
               const domain = c.domain_analysis || {};
-              const seniority = c.seniority_analysis || {};
               return (
                 <div key={c.cv_id || i} style={{ border: '1px solid #ccc', marginBottom: '10px', pageBreakInside: 'avoid' }}>
                   {/* Candidate Header */}

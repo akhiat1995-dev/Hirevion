@@ -416,20 +416,4 @@ const CountUpNumber = ({ end, duration }) => {
   return <>{count}</>;
 };
 
-export default {
-  FadeInUp,
-  FadeInLeft,
-  FadeInRight,
-  ScaleIn,
-  RotateIn,
-  StaggerContainer,
-  StaggerItem,
-  ParallaxSection,
-  TextReveal,
-  BlurIn,
-  SlideUpSkew,
-  FloatingElement,
-  PulseOnScroll,
-  ScrollProgressBar,
-  CountUp
-};
+

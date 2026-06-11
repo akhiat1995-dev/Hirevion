@@ -1,14 +1,13 @@
 import React, { useState, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
-import { Upload, Users, Brain, BarChart3, CheckCircle, ChevronRight, Pencil, Sparkles, Eye, LogIn, ArrowLeft, Star, Award, TrendingUp, Target, FileText, UserCheck, Clock, AlertCircle, X, Play, Loader } from 'lucide-react';
+import { Upload, Users, Brain, Eye, LogIn, ArrowLeft, Award, FileText, UserCheck, Clock, AlertCircle, X, Play, Loader } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import api from '../services/api';
-import { FadeInUp, StaggerContainer, StaggerItem } from '../components/ScrollAnimations';
+import { FadeInUp } from '../components/ScrollAnimations';
 
 const RecruiterDemo = () => {
-  const { t } = useLanguage();
-  const navigate = useNavigate();
+
   const [files, setFiles] = useState([]);
   const [jobTitle, setJobTitle] = useState('');
   const [jobRequirements, setJobRequirements] = useState('');

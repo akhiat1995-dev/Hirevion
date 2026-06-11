@@ -55,7 +55,6 @@ const AnimatedRoute = ({ children }) => (
 
 const AnimatedRoutes = () => {
   const location = useLocation();
-  const isHome = location.pathname === '/';
   
   return (
     <AnimatePresence mode="wait">

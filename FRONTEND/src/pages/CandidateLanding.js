@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Rocket, Upload, FileText, TrendingUp, CheckCircle, ChevronRight, Pencil, Sparkles, Star, Eye } from 'lucide-react';
-import { PencilUnderline, HandDrawnBox } from '../components/PencilDesigns';
+import { Upload, FileText, TrendingUp, CheckCircle, ChevronRight, Sparkles, Star, Eye, Pencil } from 'lucide-react';
+import { HandDrawnBox } from '../components/PencilDesigns';
 import { FadeInUp, StaggerContainer, StaggerItem } from '../components/ScrollAnimations';
 import { useLanguage } from '../context/LanguageContext';
 import '../components/PencilDesigns.css';

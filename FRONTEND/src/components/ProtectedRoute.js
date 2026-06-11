@@ -52,7 +52,7 @@ export default function ProtectedRoute({ children, requireAuth = true }) {
         }
       }
     }
-  }, [loading, isAuthenticated, requireAuth, user, navigate, location]);
+  }, [loading, isAuthenticated, requireAuth, user, userRole, navigate, location]);
 
   if (loading) {
     return (

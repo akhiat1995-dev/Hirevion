@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, Shield, Trash2, Save, AlertTriangle, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
+import { User, Mail, Shield, Trash2, Save, AlertTriangle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import { Button, Input, Alert } from '../components/ui';
+import { Button, Alert } from '../components/ui';
 
 export default function ProfileSettings() {
   const { user, logout } = useAuth();

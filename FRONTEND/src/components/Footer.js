@@ -28,13 +28,13 @@ const Footer = () => {
               {t('footerTagline')}
             </p>
             <div className="flex gap-3">
-              <a href="#" className="w-10 h-10 bg-navy-800 rounded-full flex items-center justify-center text-navy-300 hover:bg-orange-500 hover:text-white transition-all" aria-label="LinkedIn">
+              <a href="javascript:void(0)" className="w-10 h-10 bg-navy-800 rounded-full flex items-center justify-center text-navy-300 hover:bg-orange-500 hover:text-white transition-all" aria-label="LinkedIn">
                 <Linkedin size={18} />
               </a>
-              <a href="#" className="w-10 h-10 bg-navy-800 rounded-full flex items-center justify-center text-navy-300 hover:bg-orange-500 hover:text-white transition-all" aria-label="Twitter">
+              <a href="javascript:void(0)" className="w-10 h-10 bg-navy-800 rounded-full flex items-center justify-center text-navy-300 hover:bg-orange-500 hover:text-white transition-all" aria-label="Twitter">
                 <Twitter size={18} />
               </a>
-              <a href="#" className="w-10 h-10 bg-navy-800 rounded-full flex items-center justify-center text-navy-300 hover:bg-orange-500 hover:text-white transition-all" aria-label="Email">
+              <a href="javascript:void(0)" className="w-10 h-10 bg-navy-800 rounded-full flex items-center justify-center text-navy-300 hover:bg-orange-500 hover:text-white transition-all" aria-label="Email">
                 <Mail size={18} />
               </a>
             </div>

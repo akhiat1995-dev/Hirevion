@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { Rocket, Upload, Users, Pencil, Sparkles, X, ChevronRight, Zap } from 'lucide-react';
-import { PencilUnderline, HandDrawnBox } from '../components/PencilDesigns';
+import { Upload, Users, ChevronRight, Zap, Pencil } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import '../components/PencilDesigns.css';
 

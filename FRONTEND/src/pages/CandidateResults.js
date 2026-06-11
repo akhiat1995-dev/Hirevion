@@ -3,8 +3,8 @@ import { useLocation, Link } from 'react-router-dom';
 import { 
   CheckCircle, AlertCircle, ArrowLeft, Download, RefreshCw,
   TrendingUp, Award, Star, AlertTriangle, Brain, FileText, ChevronRight, 
-  Zap, Lightbulb, User, Mail, Phone, MapPin, Linkedin, Calendar, Briefcase, GraduationCap, Target, ArrowUpRight,
-  BarChart3, Clock, BookOpen, Languages, Code, Building, Globe, Loader2
+  Zap, Lightbulb, User, Mail, Phone, MapPin, Linkedin, Briefcase, GraduationCap, Target, ArrowUpRight,
+  BarChart3, Languages, Code, Globe, Loader2
 } from 'lucide-react';
 import { PencilLoading, PencilProgressBar } from '../components/PencilDesigns';
 import '../components/PencilDesigns.css';

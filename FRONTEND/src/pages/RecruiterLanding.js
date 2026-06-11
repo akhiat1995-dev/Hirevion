@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Rocket, Upload, Users, Brain, BarChart3, CheckCircle, ChevronRight, Pencil, Sparkles, Eye, Play } from 'lucide-react';
-import { PencilUnderline, HandDrawnBox, PencilButton } from '../components/PencilDesigns';
+import { Rocket, Upload, Brain, BarChart3, Pencil, Eye } from 'lucide-react';
+
 import { FadeInUp, StaggerContainer, StaggerItem } from '../components/ScrollAnimations';
 import { useLanguage } from '../context/LanguageContext';
 import '../components/PencilDesigns.css';

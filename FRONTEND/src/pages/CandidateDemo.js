@@ -1,14 +1,13 @@
 import React, { useState, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
-import { FileText, Upload, Brain, Target, CheckCircle, AlertCircle, ArrowLeft, Eye, LogIn, BarChart3, Award, Sparkles, ChevronRight, Loader, X, Play } from 'lucide-react';
+import { FileText, Upload, Brain, Target, CheckCircle, AlertCircle, ArrowLeft, Eye, LogIn, BarChart3, Award, Loader, X, Play } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import api from '../services/api';
 import { FadeInUp } from '../components/ScrollAnimations';
 
 const CandidateDemo = () => {
-  const { t } = useLanguage();
-  const navigate = useNavigate();
+
   const [file, setFile] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [results, setResults] = useState(null);

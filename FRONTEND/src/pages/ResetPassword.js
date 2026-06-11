@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Shield, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import api from '../services/api';

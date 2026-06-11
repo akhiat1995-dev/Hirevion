@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Mail, CheckCircle2, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Mail } from 'lucide-react';
 import api from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
 import { Button, Input, Alert } from '../components/ui';
